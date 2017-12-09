@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+
+        "sourceMap": true,
+        "declaration": true,
+
+        "strict": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+		"importHelpers": true,
+		"allowSyntheticDefaultImports": true,
+
+        "rootDir": "src",
+        "outDir": "build"
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}

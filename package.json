@@ -1,0 +1,31 @@
+{
+  "name": "parcel-plugin-typescript",
+  "version": "1.0.0",
+  "description": "Complete TypeScript support for Parcel bundler",
+  "author": "Fathy Boundjadj <fathy.boundjadj@gmail.com>",
+  "license": "MIT",
+  "main": "build/index.js",
+  "typings": "build/index.d.ts",
+  "files": [
+    "src",
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "@types/babel-code-frame": "^6.20.1",
+    "babel-code-frame": "^6.26.0",
+    "chalk": "^2.3.0",
+    "normalize-path": "^2.1.1",
+    "parcel-bundler": "^1.1.0",
+    "tslib": "^1.8.1",
+    "typescript": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.57",
+    "tslint": "^5.8.0",
+    "tslint-eslint-rules": "^4.1.1"
+  }
+}
