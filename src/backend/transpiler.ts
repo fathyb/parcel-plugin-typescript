@@ -5,13 +5,11 @@ import {TranspilationResult} from '../interfaces'
 export class Transpiler {
 	private readonly compilerOptions: ts.CompilerOptions
 
-	constructor(json: any) {
-		const {options} = ts.parseJsonConfigFileContent(json, ts.sys, process.cwd())
-
-		this.compilerOptions = options
+	constructor(options: ts.ParsedCommandLine) {
+		this.compilerOptions = options.options
 	}
 
-	public parse(code: string, fileName: string): TranspilationResult {
+	public transpile(code: string, fileName: string): TranspilationResult {
 		const {compilerOptions} = this
 		const {outputText} = ts.transpileModule(code, {compilerOptions, fileName})
 

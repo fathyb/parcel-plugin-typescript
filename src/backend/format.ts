@@ -1,5 +1,5 @@
 // This is directly copy-pasted from https://github.com/zinserjan/ts-diagnostic-formatter
-// The original code need throws errors because of es6-error
+// The original code throws errors because of es6-error
 
 import {EOL} from 'os'
 

@@ -2,7 +2,7 @@ import * as ts from 'typescript'
 
 import {LanguageServiceHost} from './host'
 
-import {TypeCheckingResult} from '../interfaces'
+import {TypeCheckingResult} from '../../interfaces'
 
 export class LanguageService {
 	private readonly service: ts.LanguageService
@@ -29,12 +29,15 @@ export class LanguageService {
 					throw new Error('TypeScript did not produce any output')
 				}
 
-				const sourceMap = outputFiles.find(({name}) => /\.js\.map$/.test(name))
+				const sourceMap = outputFiles
+					.filter(({name}) => /\.js\.map$/.test(name))
+					.map(({text}) => text)
+					.pop()
 
 				return {
 					sources: {
 						js: jsFile.text,
-						sourceMap: sourceMap && sourceMap.text
+						sourceMap
 					}
 				}
 			}

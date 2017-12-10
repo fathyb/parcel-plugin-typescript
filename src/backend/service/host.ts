@@ -27,11 +27,11 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 	}
 
 	public getScriptSnapshot(fileName: string): ts.IScriptSnapshot|undefined {
-		const cached = this.fileCache.get(fileName)
+		/*const cached = this.fileCache.get(fileName)
 
 		if(cached) {
 			return ts.ScriptSnapshot.fromString(cached)
-		}
+		}*/
 
 		if(!ts.sys.fileExists(fileName)) {
 			return

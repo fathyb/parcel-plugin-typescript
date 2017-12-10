@@ -1,31 +1,29 @@
 import JSAsset = require('parcel-bundler/src/assets/JSAsset')
 
-import {injectIntoWorker} from '../injector'
+import {dispatchCheckFile, inject} from '../injector/worker'
 
-import {reportDiagnostics} from '../backend/reporter'
-import {LanguageService} from '../backend/service'
-import {ConfigurationLoader} from './config-loader'
+import {ConfigurationLoader} from '../backend/config-loader'
+import {Transpiler} from '../backend/transpiler'
 
-injectIntoWorker()
+inject()
 
 export = class TSAsset extends JSAsset {
-	private service: ConfigurationLoader<LanguageService>
+	private transpiler: ConfigurationLoader<Transpiler>
 
 	constructor(name: string, pkg: string, options: any) {
 		super(name, pkg, options)
 
-		this.service = new ConfigurationLoader(name, config =>
-			new LanguageService(config)
-		)
+		this.transpiler = new ConfigurationLoader(name, config => new Transpiler(config))
 	}
 
-	public async parse(_: string) {
-		const service = await this.service.wait()
-		const result = service.parse(this.name)
+	public async parse(code: string) {
+		// ask for a type-check in the background
+		dispatchCheckFile(this.name)
 
-		reportDiagnostics(this.name, result)
+		const transpiler = await this.transpiler.wait()
+		const {sources} = transpiler.transpile(code, this.name)
 
-		this.contents = result.transpile().sources.js
+		this.contents = sources.js
 
 		// Parse result as ast format through babylon
 		return super.parse(this.contents)

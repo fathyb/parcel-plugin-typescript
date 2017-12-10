@@ -13,7 +13,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"importHelpers": true,
-		"allowSyntheticDefaultImports": true,
+		"allowSyntheticDefaultImports": false,
 
 		"rootDir": "src",
 		"outDir": "build"
