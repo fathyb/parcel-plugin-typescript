@@ -4,8 +4,6 @@ A fast TypeScript type-checker plugin for Parcel.
 
 ![Screenshot](./.assets/screenshot.png)
 
-![Demo](http://g.recordit.co/9Fc7TKFyYF.gif)
-
 ## Differences with Parcel native support
 
 The native Parcel intergation for TypeScript only transpiles and does not

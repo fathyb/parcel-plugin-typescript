@@ -1,4 +1,12 @@
+import {injectIntoMaster} from './injector'
+
 export = (bundler: any) => {
-	bundler.addAssetType('ts', require.resolve('./asset'))
-	bundler.addAssetType('tsx', require.resolve('./asset'))
+	if(bundler.farm !== null) {
+		throw new Error('invariant: farm should be null')
+	}
+
+	injectIntoMaster()
+
+	bundler.addAssetType('ts', require.resolve('./frontend/asset'))
+	bundler.addAssetType('tsx', require.resolve('./frontend/asset'))
 }
