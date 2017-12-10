@@ -2,7 +2,7 @@ import * as ts from 'typescript'
 
 import {LanguageServiceHost} from './host'
 
-import {TypeCheckingResult} from '../../interfaces'
+import {TypeCheckResult} from '../../interfaces'
 
 export class LanguageService {
 	private readonly service: ts.LanguageService
@@ -13,7 +13,7 @@ export class LanguageService {
 		this.service = ts.createLanguageService(this.host, ts.createDocumentRegistry())
 	}
 
-	public parse(path: string): TypeCheckingResult {
+	public parse(path: string): TypeCheckResult {
 		const {service} = this
 
 		this.host.invalidate(path)

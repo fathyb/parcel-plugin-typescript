@@ -6,7 +6,6 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 	public readDirectory = ts.sys.readDirectory
 
 	private readonly fileNames: string[]
-	private readonly fileCache = new Map<string, string>()
 	private readonly files: {[k: string]: {version: number}} = {}
 	private readonly options: ts.CompilerOptions
 
@@ -40,12 +39,6 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 	}
 
 	public getScriptSnapshot(fileName: string) {
-		/*const cached = this.fileCache.get(fileName)
-
-		if(cached) {
-			return ts.ScriptSnapshot.fromString(cached)
-		}*/
-
 		if(!ts.sys.fileExists(fileName)) {
 			return
 		}
@@ -53,8 +46,6 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 		const content = ts.sys.readFile(fileName)
 
 		if(content) {
-			this.fileCache.set(fileName, content)
-
 			return ts.ScriptSnapshot.fromString(content)
 		}
 	}

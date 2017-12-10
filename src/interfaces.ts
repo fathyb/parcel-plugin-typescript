@@ -1,27 +1,27 @@
 import {Diagnostic} from 'typescript'
 
-export interface Message<T extends string, U extends {} = {}> {
-	__parcelTypeScript: U & {
-		type: T
-	}
+export type Message<T extends string, U extends {} = {}> = U & {
+	type: T
 }
 
 export type CheckFileMessage = Message<'check-file', {
 	file: string
 }>
 
-export type InjectedMessage = CheckFileMessage
+export interface InjectedMessage {
+	__parcelTypeScript: CheckFileMessage
+}
 
-export interface TranspilationResult {
+export interface TranspileResult {
 	sources: {
 		js: string
 		sourceMap?: string
 	}
 }
 
-export interface TypeCheckingResult {
+export interface TypeCheckResult {
 	syntacticDiagnostics: Diagnostic[]
 	semanticDiagnostics: Diagnostic[]
 
-	transpile(): TranspilationResult
+	transpile(): TranspileResult
 }

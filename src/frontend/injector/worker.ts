@@ -19,6 +19,6 @@ function dispatchMessage(message: InjectedMessage) {
 	// else we are in the main thread
 	// this may happen on the first build
 	else {
-		receiveMessage(message)
+		receiveMessage(message, false)
 	}
 }

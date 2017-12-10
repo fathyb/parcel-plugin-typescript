@@ -1,11 +1,9 @@
+import {ChildProcess, fork} from 'child_process'
+
 import WorkerFarm = require('parcel-bundler/src/WorkerFarm')
 
-import {ConfigurationLoader} from '../../backend/config-loader'
-import {reportDiagnostics} from '../../backend/reporter'
-import {LanguageService} from '../../backend/service'
 import {InjectedMessage} from '../../interfaces'
-
-let serviceConfig: ConfigurationLoader<LanguageService>|null = null
+import {typeCheck} from '../process/checker'
 
 /**
  * This function patch the WorkerFrame properties to interecpt
@@ -19,10 +17,11 @@ export function inject() {
 	}
 }
 
+// We create a proxy layer between the worker and the master
 const injectedReceive = ((receive: () => void) =>
 	function(this: any, data: InjectedMessage) {
 		if(data && data.__parcelTypeScript) {
-			receiveMessage(data)
+			receiveMessage(data, true)
 		}
 		else {
 			return receive.call(this, data)
@@ -30,7 +29,9 @@ const injectedReceive = ((receive: () => void) =>
 	}
 )(WorkerFarm.prototype.receive)
 
-export async function receiveMessage(data: InjectedMessage) {
+let forkedProcess: ChildProcess|null = null
+
+export async function receiveMessage(data: InjectedMessage, fromWorker: boolean) {
 	if(!data || !data.__parcelTypeScript) {
 		throw new Error('Unknown Parcel TypeScript input message')
 	}
@@ -38,17 +39,17 @@ export async function receiveMessage(data: InjectedMessage) {
 	const {__parcelTypeScript: message} = data
 
 	if(message.type === 'check-file') {
-		const {file} = message
+		// If we are in a worker (in watch mode)
+		if(fromWorker) {
+			if(forkedProcess === null) {
+				forkedProcess = fork(require.resolve('../process'))
+			}
 
-		// TODO: move this to a background thread
-		if(serviceConfig === null) {
-			serviceConfig = new ConfigurationLoader(file, config => new LanguageService(config))
+			forkedProcess.send(message)
 		}
-
-		const service = await serviceConfig.wait()
-		const result = service.parse(file)
-
-		reportDiagnostics(result)
+		else {
+			typeCheck(message.file)
+		}
 	}
 	else {
 		throw new Error(`Unknown Parcel TypeScript message "${message}"`)
