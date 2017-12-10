@@ -2,10 +2,13 @@ import JSAsset = require('parcel-bundler/src/assets/JSAsset')
 
 import {ConfigurationLoader} from '../backend/config-loader'
 import {Transpiler} from '../backend/transpiler'
+import {TranspileResult} from '../interfaces'
+
 import {dispatchCheckFile} from './injector/worker'
+import {typeCheck} from './process/checker'
 
 export = class TSAsset extends JSAsset {
-	private transpiler: ConfigurationLoader<Transpiler>
+	private readonly transpiler: ConfigurationLoader<Transpiler>
 
 	constructor(name: string, pkg: string, options: any) {
 		super(name, pkg, options)
@@ -14,13 +17,24 @@ export = class TSAsset extends JSAsset {
 	}
 
 	public async parse(code: string) {
-		// ask for a type-check in the background
-		dispatchCheckFile(this.name)
+		let result: TranspileResult
 
-		const transpiler = await this.transpiler.wait()
-		const {sources} = transpiler.transpile(code, this.name)
+		// if we are in the main thread let's transpile and check
+		// at the same time
+		if(!process.send) {
+			const [check] = await typeCheck(this.name)
 
-		this.contents = sources.js
+			result = check.transpile()
+		}
+		else {
+			// ask for a type-check in the background
+			dispatchCheckFile(this.name)
+
+			const transpiler = await this.transpiler.wait()
+			result = transpiler.transpile(code, this.name)
+		}
+
+		this.contents = result.sources.js
 
 		// Parse result as ast format through babylon
 		return super.parse(this.contents)
