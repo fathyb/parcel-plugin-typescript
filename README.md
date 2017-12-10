@@ -14,6 +14,9 @@ wasn't enabled.
 
 A type error **will not prevent the bundle from being bundled**, we just report them.
 
+The goal of this plugin is too bring **complete** TypeScript support to Parcel,
+with little to no configuration. This includes transformers and linters.
+
 ## Installation
 `yarn add parcel-plugin-typescript`
 
@@ -21,9 +24,12 @@ or
 
 `npm install parcel-plugin-typescript`
 
+And that's it, z e r o configuration.
+
 ## Roadmap
 
 - [x] fork the type-checker in another process
 - [x] implement incremental builds
+- [ ] write tests
 - [ ] support custom transformers
 - [ ] support TSLint (and share the AST with it)
