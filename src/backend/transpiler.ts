@@ -11,12 +11,10 @@ export class Transpiler {
 
 	public transpile(code: string, fileName: string): TranspilationResult {
 		const {compilerOptions} = this
-		const {outputText} = ts.transpileModule(code, {compilerOptions, fileName})
+		const {outputText: js, sourceMapText: sourceMap} = ts.transpileModule(code, {compilerOptions, fileName})
 
 		return {
-			sources: {
-				js: outputText
-			}
+			sources: {js, sourceMap}
 		}
 	}
 }

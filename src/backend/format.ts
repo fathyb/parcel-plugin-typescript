@@ -16,8 +16,9 @@ export function formatDiagnostic(diagnostics: Diagnostic[], context: string): st
 		if(diagnostic.file != null && diagnostic.start != null) {
 			const lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
 			const source = diagnostic.file.text || diagnostic.source
+			const red = chalk.red(`🚨  ${diagnostic.file.fileName}(${lineChar.line + 1},${lineChar.character + 1})`)
 
-			const messages = [chalk.dim(` ${lineChar.line + 1}:${lineChar.character + 1}  `) + messageText]
+			const messages = [`${red}\n${chalk.redBright(messageText)}`]
 
 			if(source != null) {
 				const frame = codeFrame(
@@ -26,10 +27,13 @@ export function formatDiagnostic(diagnostics: Diagnostic[], context: string): st
 					lineChar.character,
 					{linesAbove: 1, linesBelow: 1, highlightCode: true}
 				)
-					.split('\n')
-					.map(str => `  ${str}`)
-					.join('\n')
-				messages.push(frame)
+
+				messages.push(
+					frame
+						.split('\n')
+						.map(str => `  ${str}`)
+						.join('\n')
+				)
 			}
 			message = messages.join('\n')
 		}

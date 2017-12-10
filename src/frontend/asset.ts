@@ -1,11 +1,8 @@
 import JSAsset = require('parcel-bundler/src/assets/JSAsset')
 
-import {dispatchCheckFile, inject} from '../injector/worker'
-
 import {ConfigurationLoader} from '../backend/config-loader'
 import {Transpiler} from '../backend/transpiler'
-
-inject()
+import {dispatchCheckFile} from './injector/worker'
 
 export = class TSAsset extends JSAsset {
 	private transpiler: ConfigurationLoader<Transpiler>

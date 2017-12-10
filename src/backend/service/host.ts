@@ -18,6 +18,19 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 		this.fileNames = fileNames
 	}
 
+	public invalidate(file: string): void {
+		const entry = this.files[file]
+
+		if(entry) {
+			entry.version++
+		}
+		else {
+			this.files[file] = {
+				version: 0
+			}
+		}
+	}
+
 	public getScriptFileNames() {
 		return this.fileNames
 	}
@@ -26,7 +39,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 		return this.files[fileName] && this.files[fileName].version.toString()
 	}
 
-	public getScriptSnapshot(fileName: string): ts.IScriptSnapshot|undefined {
+	public getScriptSnapshot(fileName: string) {
 		/*const cached = this.fileCache.get(fileName)
 
 		if(cached) {

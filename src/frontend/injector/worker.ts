@@ -1,14 +1,6 @@
-import {CheckFileMessage, InjectedMessage, ReadyMessage} from '../interfaces'
+import {InjectedMessage} from '../../interfaces'
 
 import {receiveMessage} from './master'
-
-export function inject() {
-	dispatchMessage({
-		__parcelTypeScript: {
-			type: 'ready'
-		}
-	} as ReadyMessage)
-}
 
 export function dispatchCheckFile(file: string) {
 	dispatchMessage({
@@ -16,13 +8,16 @@ export function dispatchCheckFile(file: string) {
 			type: 'check-file',
 			file
 		}
-	} as CheckFileMessage)
+	})
 }
 
 function dispatchMessage(message: InjectedMessage) {
+	// if process.send is defined then we are in a worker
 	if(process.send) {
 		process.send(message)
 	}
+	// else we are in the main thread
+	// this may happen on the first build
 	else {
 		receiveMessage(message)
 	}

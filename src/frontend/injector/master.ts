@@ -1,9 +1,9 @@
 import WorkerFarm = require('parcel-bundler/src/WorkerFarm')
 
-import {ConfigurationLoader} from '../backend/config-loader'
-import {reportDiagnostics} from '../backend/reporter'
-import {LanguageService} from '../backend/service'
-import {InjectedMessage} from '../interfaces'
+import {ConfigurationLoader} from '../../backend/config-loader'
+import {reportDiagnostics} from '../../backend/reporter'
+import {LanguageService} from '../../backend/service'
+import {InjectedMessage} from '../../interfaces'
 
 let serviceConfig: ConfigurationLoader<LanguageService>|null = null
 
@@ -14,17 +14,21 @@ let serviceConfig: ConfigurationLoader<LanguageService>|null = null
  * and then dispatched to the type-checking worker.
  */
 export function inject() {
-	const {receive} = WorkerFarm.prototype
+	if(WorkerFarm.prototype.receive !== injectedReceive) {
+		WorkerFarm.prototype.receive = injectedReceive
+	}
+}
 
-	WorkerFarm.prototype.receive = async function(this: any, data: InjectedMessage) {
+const injectedReceive = ((receive: () => void) =>
+	function(this: any, data: InjectedMessage) {
 		if(data && data.__parcelTypeScript) {
 			receiveMessage(data)
 		}
 		else {
-			receive.call(this, data)
+			return receive.call(this, data)
 		}
 	}
-}
+)(WorkerFarm.prototype.receive)
 
 export async function receiveMessage(data: InjectedMessage) {
 	if(!data || !data.__parcelTypeScript) {
@@ -33,10 +37,7 @@ export async function receiveMessage(data: InjectedMessage) {
 
 	const {__parcelTypeScript: message} = data
 
-	if(message.type === 'ready') {
-		// console.log('\nWorker is ready\n')
-	}
-	else if(message.type === 'check-file') {
+	if(message.type === 'check-file') {
 		const {file} = message
 
 		// TODO: move this to a background thread
@@ -47,7 +48,7 @@ export async function receiveMessage(data: InjectedMessage) {
 		const service = await serviceConfig.wait()
 		const result = service.parse(file)
 
-		reportDiagnostics(file, result)
+		reportDiagnostics(result)
 	}
 	else {
 		throw new Error(`Unknown Parcel TypeScript message "${message}"`)

@@ -6,12 +6,11 @@ export interface Message<T extends string, U extends {} = {}> {
 	}
 }
 
-export type ReadyMessage = Message<'ready'>
 export type CheckFileMessage = Message<'check-file', {
 	file: string
 }>
 
-export type InjectedMessage = ReadyMessage | CheckFileMessage
+export type InjectedMessage = CheckFileMessage
 
 export interface TranspilationResult {
 	sources: {

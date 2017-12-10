@@ -6,15 +6,17 @@ import {TypeCheckingResult} from '../../interfaces'
 
 export class LanguageService {
 	private readonly service: ts.LanguageService
+	private readonly host: LanguageServiceHost
 
 	constructor(json: any) {
-		const host = new LanguageServiceHost(json)
-
-		this.service = ts.createLanguageService(host, ts.createDocumentRegistry())
+		this.host = new LanguageServiceHost(json)
+		this.service = ts.createLanguageService(this.host, ts.createDocumentRegistry())
 	}
 
 	public parse(path: string): TypeCheckingResult {
 		const {service} = this
+
+		this.host.invalidate(path)
 
 		return {
 			syntacticDiagnostics: service.getSyntacticDiagnostics(path),

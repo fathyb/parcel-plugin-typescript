@@ -1,4 +1,4 @@
-import {inject} from './injector/master'
+import {inject} from './frontend/injector/master'
 
 export = (bundler: any) => {
 	if(bundler.farm !== null) {
