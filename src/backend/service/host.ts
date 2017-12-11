@@ -9,10 +9,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 	private readonly files: {[k: string]: {version: number}} = {}
 	private readonly options: ts.CompilerOptions
 
-	constructor(json: any) {
-		// TODO: do not use process.cwd()
-		const {fileNames, options} = ts.parseJsonConfigFileContent(json, ts.sys, process.cwd())
-
+	constructor({fileNames, options}: ts.ParsedCommandLine) {
 		this.options = options
 		this.fileNames = fileNames
 	}
