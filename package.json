@@ -8,8 +8,7 @@
   "typings": "build/index.d.ts",
   "files": [
     "src",
-	"build",
-	".assets"
+    "build"
   ],
   "scripts": {
     "build": "tsc",
@@ -22,6 +21,7 @@
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0-beta.34",
+    "@ngtools/webpack": "^1.9.0",
     "chalk": "^2.3.0",
     "comment-json": "^1.1.3",
     "find-up": "^2.1.0",
@@ -32,13 +32,13 @@
   "devDependencies": {
     "@types/comment-json": "^1.1.0",
     "@types/find-up": "^2.1.1",
-    "@types/node": "^8.0.57",
+    "@types/node": "~7.0.0",
     "@types/resolve": "^0.0.4",
     "husky": "^0.14.3",
     "npm-run-all": "^4.1.2",
     "standard-version": "^4.2.0",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
-    "typescript": "^2.6.2"
+    "typescript": "~2.5.0"
   }
 }
