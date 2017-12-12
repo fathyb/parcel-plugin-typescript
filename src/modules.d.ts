@@ -2,6 +2,7 @@ declare module 'parcel-bundler/src/assets/JSAsset' {
 	class JSAsset {
 		public name: string
 		public contents?: string
+		public options?: any
 
 		constructor(name: string, pkg: string, options: any)
 
@@ -24,7 +25,7 @@ declare module 'enhanced-resolve/lib/getInnerRequest' {
 
 	interface Callback {
 		(err?: Error, result?: any): void;
-	
+
 		log?: any;
 		stack?: any;
 		missing?: any;

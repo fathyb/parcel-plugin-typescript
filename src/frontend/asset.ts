@@ -17,11 +17,11 @@ export = class TSAsset extends JSAsset {
 	}
 
 	public async parse(code: string) {
+		const {options} = this
 		let result: TranspileResult
 
-		// if we are in the main thread let's transpile and check
-		// at the same time
-		if(!process.send) {
+		// if we are not watching let's transpile and check at the same time
+		if(!options.watch) {
 			const [check] = await typeCheck(this.name)
 
 			result = check.transpile()
