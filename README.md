@@ -6,15 +6,13 @@ Complete TypeScript integration for Parcel.
 
 ## Differences with Parcel native support
 
-Parcel has built-in transpiling support for TypeScript OOB. This plugin provides additionnal features like :
-- type checking
-- paths mapping
-- Angular support
+Parcel has built-in transpiling support for TypeScript OOB. This plugin provides additionnal features listed in [Features](#features).
 
 If you only need transpiling then this plugin might not be necessary. You can see
 this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
-### Features
+
+## Features
 
 - Transpiling: this is what you get when this plugin is not installed, straight and simple
 transpilation TS -> JS
