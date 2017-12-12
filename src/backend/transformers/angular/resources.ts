@@ -8,7 +8,7 @@ import {
 	makeTransform,
 	ReplaceNodeOperation,
 	StandardTransform,
-	TransformOperation,
+	TransformOperation
 } from '@ngtools/webpack/src/transformers'
 
 export function replaceResources(

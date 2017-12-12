@@ -19,7 +19,6 @@ export class ConfigurationLoader<T> {
 
 			if(!options) {
 				const configPath = await findUp('tsconfig.json', {cwd})
-
 				const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
 				const transpilerOptions = {
 					compilerOptions: {

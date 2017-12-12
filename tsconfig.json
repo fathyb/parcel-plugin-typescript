@@ -3,7 +3,7 @@
 		"target": "es6",
 		"module": "commonjs",
 
-		"types": ["node"],
+		"types": ["node", "typescript"],
 
 		"sourceMap": true,
 		"declaration": true,
