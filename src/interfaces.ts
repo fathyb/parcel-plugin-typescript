@@ -7,9 +7,13 @@ export type Message<T extends string, U extends {} = {}> = U & {
 export type CheckFileMessage = Message<'check-file', {
 	file: string
 }>
+export type AngularCompilerMessage = Message<'angular:compile', {
+	file: string
+	tsConfig: string
+}>
 
 export interface InjectedMessage {
-	__parcelTypeScript: CheckFileMessage
+	__parcelTypeScript: CheckFileMessage | AngularCompilerMessage
 }
 
 export interface TranspileResult {
