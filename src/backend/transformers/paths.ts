@@ -7,23 +7,25 @@ import {findModule} from '../modules/resolver'
 export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactory<ts.SourceFile> {
 	return function(context: ts.TransformationContext) {
 		return (node: ts.SourceFile) => {
-			ts.visitEachChild(node, child => {
-				if(ts.isImportDeclaration(child)) {
-					const specifier = child.moduleSpecifier
+			if(options.baseUrl) {
+				ts.visitEachChild(node, child => {
+					if(ts.isImportDeclaration(child)) {
+						const specifier = child.moduleSpecifier
 
-					if(!ts.isStringLiteral(specifier)) {
-						throw new Error('Expected child.moduleSpecifier to be StringLiteral')
+						if(!ts.isStringLiteral(specifier)) {
+							throw new Error('Expected child.moduleSpecifier to be StringLiteral')
+						}
+
+						const resolved = resolve(specifier.text, options)
+
+						child.moduleSpecifier = ts.createLiteral(resolved)
+
+						return child
 					}
 
-					const resolved = resolve(specifier.text, options)
-
-					child.moduleSpecifier = ts.createLiteral(resolved)
-
-					return child
-				}
-
-				return undefined
-			}, context)
+					return undefined
+				}, context)
+			}
 
 			return node
 		}

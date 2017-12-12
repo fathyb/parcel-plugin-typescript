@@ -1,6 +1,6 @@
 # parcel-plugin-typescript
 
-Complete TypeScript integration for Parcel.
+Enhanced TypeScript integration for Parcel.
 
 ![Screenshot](./.assets/screenshot.png)
 
@@ -11,6 +11,7 @@ Parcel has built-in transpiling support for TypeScript OOB. This plugin provides
 If you only need transpiling then this plugin might not be necessary. You can see
 this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
+This plugin is in it's early stage and may not be stable. This first stable version will be `1.0.0`.
 
 ## Features
 
@@ -19,14 +20,16 @@ transpilation TS -> JS
 - Type checking: it checks your TypeScript code for errors in a separated process for speed
 - Path mappings: it rewrites your `import` on the fly accordingly to your `paths` and `baseUrl`
 compiler options
-- Angular support: it supports Angular resources inlining (eg. `templateUrl` -> `template`) for JIT compilation
+- Angular support (experimental, only enabled if Angular is installed) :
+	- AOT compilation, using the official Angular compiler for smaller and faster applications.
+	- Lazy Loading, the plugin automagically splits your Angular modules in multiple JavaScript files with Parcel when you use lazy routes.
+	- Template parsing, your templates are processed by Parcel to find and replaces resources, even in AOT.
+	- Transformations :
+		- It removes all your Angular decorators in AOT mode for smaller bundles
+		- It replaces the `@angular/platform-browser-dynamic` with `@angular/platform-browser` module in AOT mode, so you can keep one main file
 
 ### Coming features
 
-*Your help is welcome*
-
-- Angular AOT compilation using official Angular toolchain
-	- on the `angular/aot` branch
 - TSLint support
 - User defined AST transformers
 

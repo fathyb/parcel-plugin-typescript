@@ -1,15 +1,13 @@
-// @ignoreDep typescript
+import {dirname, resolve} from 'path'
 import * as ts from 'typescript'
 
-import {
-	AddNodeOperation,
-	collectDeepNodes,
-	getFirstNode,
-	makeTransform,
-	ReplaceNodeOperation,
-	StandardTransform,
-	TransformOperation
-} from '@ngtools/webpack/src/transformers'
+import {collectDeepNodes, getFirstNode} from './ast-helpers'
+import {AddNodeOperation, ReplaceNodeOperation, StandardTransform, TransformOperation} from './interfaces'
+import {makeTransform} from './make-transform'
+
+export interface ResourcesMap {
+	[path: string]: string
+}
 
 export function replaceResources(
 	shouldTransform: (fileName: string) => boolean
@@ -21,12 +19,28 @@ export function replaceResources(
 			return ops
 		}
 
-		const replacements = findResources(sourceFile)
+		const resources = findResources(sourceFile)
 
-		if(replacements.length > 0) {
-
+		if(resources.length > 0) {
 			// Add the replacement operations.
-			ops.push(...(replacements.map(rep => rep.replaceNodeOperation)))
+			ops.push(...(resources.map(resource => {
+				if(resource.type === 'template') {
+					const propAssign = ts.createPropertyAssignment('template', createPreProcessorNode(resource.path, resource.type))
+
+					return new ReplaceNodeOperation(sourceFile, resource.node, propAssign)
+				}
+				else if(resource.type === 'style') {
+					const literals = ts.createArrayLiteral(
+						resource.path.map(path => createPreProcessorNode(path, resource.type))
+					)
+
+					const propAssign = ts.createPropertyAssignment('styles', literals)
+
+					return new ReplaceNodeOperation(sourceFile, resource.node, propAssign)
+				}
+
+				throw new Error('invariant error')
+			})))
 
 			// If we added a require call, we need to also add typings for it.
 			// The typings need to be compatible with node typings, but also work by themselves.
@@ -55,70 +69,63 @@ export function replaceResources(
 	return makeTransform(standardTransform)
 }
 
-export interface ResourceReplacement {
-	resourcePaths: string[]
-	replaceNodeOperation: ReplaceNodeOperation
+export interface SourceFileTemplateResource {
+	type: 'template'
+	path: string
+	node: ts.PropertyAssignment
+}
+export interface SourceFileStyleResource {
+	type: 'style'
+	path: string[]
+	node: ts.PropertyAssignment
 }
 
-export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] {
-	const replacements: ResourceReplacement[] = []
+export type SourceFileResource = SourceFileTemplateResource | SourceFileStyleResource
 
+export function findResources(sourceFile: ts.SourceFile): SourceFileResource[] {
 	// Find all object literals.
-	collectDeepNodes<ts.ObjectLiteralExpression>(sourceFile, ts.SyntaxKind.ObjectLiteralExpression)
+	return collectDeepNodes<ts.ObjectLiteralExpression>(sourceFile, ts.SyntaxKind.ObjectLiteralExpression)
 		// Get all their property assignments.
 		.map(node => collectDeepNodes<ts.PropertyAssignment>(node, ts.SyntaxKind.PropertyAssignment))
 		// Flatten into a single array (from an array of array<property assignments>).
 		.reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
 		// We only want property assignments for the templateUrl/styleUrls keys.
 		.filter((node: ts.PropertyAssignment) => {
-			const key = _getContentOfKeyLiteral(node.name)
+			const key = getContentOfKeyLiteral(node.name)
+
 			if(!key) {
 				// key is an expression, can't do anything.
 				return false
 			}
+
 			return key === 'templateUrl' || key === 'styleUrls'
 		})
-		// Replace templateUrl/styleUrls key with template/styles, and and paths with require('path').
-		.forEach((node: ts.PropertyAssignment) => {
-			const key = _getContentOfKeyLiteral(node.name)
+		.map((node): SourceFileResource|undefined => {
+			const key = getContentOfKeyLiteral(node.name)
 
 			if(key === 'templateUrl') {
-				const resourcePath = _getResourceRequest(node.initializer, sourceFile)
-				const requireCall = _createRequireCall(resourcePath)
-				const propAssign = ts.createPropertyAssignment('template', requireCall)
-				replacements.push({
-					resourcePaths: [resourcePath],
-					replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign)
-				})
+				const path = getResourceRequest(node.initializer, sourceFile)
+
+				return {path, node, type: 'template'}
 			}
 			else if(key === 'styleUrls') {
-				const arr = collectDeepNodes<ts.ArrayLiteralExpression>(node,
-					ts.SyntaxKind.ArrayLiteralExpression)
+				const arr = collectDeepNodes<ts.ArrayLiteralExpression>(node, ts.SyntaxKind.ArrayLiteralExpression)
+
 				if(!arr || arr.length === 0 || arr[0].elements.length === 0) {
 					return
 				}
 
-				const stylePaths = arr[0].elements.map((element: ts.Expression) => {
-					return _getResourceRequest(element, sourceFile)
-				})
-
-				const requireArray = ts.createArrayLiteral(
-					stylePaths.map(path => _createRequireCall(path))
-				)
-
-				const propAssign = ts.createPropertyAssignment('styles', requireArray)
-				replacements.push({
-					resourcePaths: stylePaths,
-					replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign)
-				})
+				return {
+					type: 'style',
+					path: arr[0].elements.map(element => getResourceRequest(element, sourceFile)),
+					node
+				}
 			}
 		})
-
-	return replacements
-
+		.filter(resource => resource !== undefined) as SourceFileResource[]
 }
 
-function _getContentOfKeyLiteral(node?: ts.Node): string | null {
+function getContentOfKeyLiteral(node?: ts.Node): string | null {
 	if(!node) {
 		return null
 	}
@@ -133,7 +140,9 @@ function _getContentOfKeyLiteral(node?: ts.Node): string | null {
 	}
 }
 
-function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
+function getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
+	let path: string|null = null
+
 	if(
 		element.kind === ts.SyntaxKind.StringLiteral ||
 		element.kind === ts.SyntaxKind.NoSubstitutionTemplateLiteral
@@ -141,20 +150,19 @@ function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) 
 		const url = (element as ts.StringLiteral).text
 
 		// If the URL does not start with ./ or ../, prepends ./ to it.
-		return `${/^\.?\.\//.test(url) ? '' : './'}${url}`
+		path = `${/^\.?\.\//.test(url) ? '' : './'}${url}`
 	} else {
 		// if not string, just use expression directly
-		return element.getFullText(sourceFile)
+		path = element.getFullText(sourceFile)
 	}
+
+	const directory = dirname(sourceFile.fileName)
+
+	return resolve(directory, path)
 }
 
-function _createRequireCall(path: string) {
-	return ts.createCall(
-		ts.createIdentifier("require('fs').readFileSync"),
-		[],
-		[
-			ts.createAdd(ts.createIdentifier('__dirname'), ts.createLiteral('/' + path.replace(/^\.\//, ''))),
-			ts.createObjectLiteral([ts.createPropertyAssignment('encoding', ts.createLiteral('utf-8'))])
-		]
-	)
+function createPreProcessorNode(path: string, type: 'template'|'style') {
+	const base64 = new Buffer(path).toString('base64')
+
+	return ts.createLiteral(`_PRAGMA_PARCEL_TYPESCRIPT_PLUGIN_PREPROCESS_${type.toUpperCase()}(${base64})`)
 }

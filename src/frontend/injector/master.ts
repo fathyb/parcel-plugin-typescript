@@ -1,57 +1,55 @@
-import {ChildProcess, fork} from 'child_process'
+// TODO: Ok this has become a mess, need to clean this
 
-import WorkerFarm = require('parcel-bundler/src/WorkerFarm')
+import {dirname, resolve} from 'path'
 
-import {InjectedMessage} from '../../interfaces'
-import {typeCheck} from '../process/checker'
+import {startIPCServer} from '../multi-process/ipc/server'
 
-/**
- * This function patch the WorkerFrame properties to interecpt
- * all messages sent from the workers.
- * When a file is updated a message will be sent to the master
- * and then dispatched to the type-checking worker.
- */
-export function inject() {
-	if(WorkerFarm.prototype.receive !== injectedReceive) {
-		WorkerFarm.prototype.receive = injectedReceive
+export function startServer(bundler: any) {
+	if(!process.send) {
+		startIPCServer(bundler)
 	}
 }
 
-// We create a proxy layer between the worker and the master
-const injectedReceive = ((receive: () => void) =>
-	function(this: any, data: InjectedMessage) {
-		if(data && data.__parcelTypeScript) {
-			receiveMessage(data, true)
-		}
-		else {
-			return receive.call(this, data)
-		}
-	}
-)(WorkerFarm.prototype.receive)
+/**
+ * When generating files on the fly (eg. Angular) we need to
+ * override Parcel cache and resolver for it to work properly
+ */
+export function injectAngularSupport(bundler: any) {
+	const {cache, resolver} = bundler
 
-let forkedProcess: ChildProcess|null = null
+	if(cache) {
+		const Cache = cache.constructor
+		const CacheWrite = Cache.prototype.write
+		const CacheRead = Cache.prototype.read
 
-export async function receiveMessage(data: InjectedMessage, fromWorker: boolean) {
-	if(!data || !data.__parcelTypeScript) {
-		throw new Error('Unknown Parcel TypeScript input message')
-	}
-
-	const {__parcelTypeScript: message} = data
-
-	if(message.type === 'check-file') {
-		// If we are in a worker (in watch mode)
-		if(fromWorker) {
-			if(forkedProcess === null) {
-				forkedProcess = fork(require.resolve('../process'))
+		cache.write = function(this: any, file: string, data: any) {
+			if(/\.ng(factory)|(style)\.js$/.test(file) || /\.ts$/.test(file)) {
+				return Promise.resolve()
 			}
 
-			forkedProcess.send(message)
+			return CacheWrite.call(this, file, data)
 		}
-		else {
-			typeCheck(message.file)
+
+		cache.read = function(this: any, file: string) {
+			if(/\.ng(factory)|(style)\.js$/.test(file)) {
+				return Promise.resolve(null)
+			}
+
+			return CacheRead.call(this, file)
 		}
 	}
-	else {
-		throw new Error(`Unknown Parcel TypeScript message "${message}"`)
+
+	const Resolver = resolver.constructor
+	const ResolveInternal = Resolver.prototype.resolveInternal
+
+	resolver.resolveInternal = function(this: any, path: string, parent: string, ...args: any[]) {
+		if(/\.ngfactory$/.test(path) || /\.ngstyle$/.test(path)) {
+			return resolve(dirname(parent), `${path}.js`)
+		}
+		if(/\.ngfactory\.js$/.test(path) || /\.ngstyle\.js$/.test(path)) {
+			return resolve(dirname(parent), path)
+		}
+
+		return ResolveInternal.call(this, path, parent, ...args)
 	}
 }
