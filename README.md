@@ -1,21 +1,36 @@
 # parcel-plugin-typescript
 
-A fast TypeScript type-checker plugin for Parcel.
+Complete TypeScript integration for Parcel.
 
 ![Screenshot](./.assets/screenshot.png)
 
 ## Differences with Parcel native support
 
-The native Parcel intergation for TypeScript only transpiles and does not
-support type-checking.
-This plugin provides it by transpiling while checking on a separate process.
-This will make incremental builds (like in watch mode) as fast as if type-checking
-wasn't enabled.
+Parcel has built-in transpiling support for TypeScript OOB. This plugin provides additionnal features like :
+- type checking
+- paths mapping
+- Angular support
 
-A type error **will not prevent the bundle from being bundled**, we just report them.
+If you only need transpiling then this plugin might not be necessary. You can see
+this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
-The goal of this plugin is too bring **complete** TypeScript support to Parcel,
-with little to no configuration. This includes transformers and linters.
+### Features
+
+- Transpiling: this is what you get when this plugin is not installed, straight and simple
+transpilation TS -> JS
+- Type checking: it checks your TypeScript code for errors in a separated process for speed
+- Path mappings: it rewrites your `import` on the fly accordingly to your `paths` and `baseUrl`
+compiler options
+- Angular support: it supports Angular resources inlining (eg. `templateUrl` -> `template`) for JIT compilation
+
+### Coming features
+
+*Your help is welcome*
+
+- Angular AOT compilation using official Angular toolchain
+	- on the `angular/aot` branch
+- TSLint support
+- User defined AST transformers
 
 ## Installation
 `yarn add parcel-plugin-typescript`
@@ -25,11 +40,3 @@ or
 `npm install parcel-plugin-typescript`
 
 And that's it, z e r o configuration.
-
-## Roadmap
-
-- [x] fork the type-checker in another process
-- [x] implement incremental builds
-- [ ] write tests
-- [ ] support custom transformers
-- [ ] support TSLint (and share the AST with it)
