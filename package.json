@@ -4,6 +4,7 @@
   "description": "Complete TypeScript support for Parcel bundler",
   "author": "Fathy Boundjadj <fathy.boundjadj@gmail.com>",
   "license": "MIT",
+  "repository": "https://github.com/fathyb/parcel-plugin-typescript.git",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
   "files": [
