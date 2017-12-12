@@ -1,15 +1,11 @@
-// @ignoreDep typescript
+import {readFileSync} from 'fs'
+import {dirname} from 'path'
+
 import * as ts from 'typescript'
 
-import {
-	AddNodeOperation,
-	collectDeepNodes,
-	getFirstNode,
-	makeTransform,
-	ReplaceNodeOperation,
-	StandardTransform,
-	TransformOperation
-} from '@ngtools/webpack/src/transformers'
+import {collectDeepNodes, getFirstNode} from './ast-helpers'
+import {AddNodeOperation, ReplaceNodeOperation, StandardTransform, TransformOperation} from './interfaces'
+import {makeTransform} from './make-transform'
 
 export function replaceResources(
 	shouldTransform: (fileName: string) => boolean
@@ -55,12 +51,12 @@ export function replaceResources(
 	return makeTransform(standardTransform)
 }
 
-export interface ResourceReplacement {
+interface ResourceReplacement {
 	resourcePaths: string[]
 	replaceNodeOperation: ReplaceNodeOperation
 }
 
-export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] {
+function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] {
 	const replacements: ResourceReplacement[] = []
 
 	// Find all object literals.
@@ -84,7 +80,7 @@ export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] 
 
 			if(key === 'templateUrl') {
 				const resourcePath = _getResourceRequest(node.initializer, sourceFile)
-				const requireCall = _createRequireCall(resourcePath)
+				const requireCall = _createRequireCall(sourceFile.fileName, resourcePath)
 				const propAssign = ts.createPropertyAssignment('template', requireCall)
 				replacements.push({
 					resourcePaths: [resourcePath],
@@ -103,7 +99,7 @@ export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] 
 				})
 
 				const requireArray = ts.createArrayLiteral(
-					stylePaths.map(path => _createRequireCall(path))
+					stylePaths.map(path => _createRequireCall(sourceFile.fileName, path))
 				)
 
 				const propAssign = ts.createPropertyAssignment('styles', requireArray)
@@ -148,13 +144,10 @@ function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) 
 	}
 }
 
-function _createRequireCall(path: string) {
-	return ts.createCall(
-		ts.createIdentifier("require('fs').readFileSync"),
-		[],
-		[
-			ts.createAdd(ts.createIdentifier('__dirname'), ts.createLiteral('/' + path.replace(/^\.\//, ''))),
-			ts.createObjectLiteral([ts.createPropertyAssignment('encoding', ts.createLiteral('utf-8'))])
-		]
-	)
+function _createRequireCall(file: string, resource: string) {
+	const dir = dirname(file)
+	const resourcePath = dir + '/' + resource.replace(/^\.\//, '')
+	const content = readFileSync(resourcePath, {encoding: 'utf-8'})
+
+	return ts.createLiteral(content)
 }

@@ -7,41 +7,31 @@ declare module 'parcel-bundler/src/assets/JSAsset' {
 		constructor(name: string, pkg: string, options: any)
 
 		parse(code: string): Promise<any>
+		load(): Promise<string>
+	}
+
+	export = JSAsset
+}
+declare module 'parcel-bundler/src/assets/HTMLAsset' {
+	class JSAsset {
+		public name: string
+		public contents?: string
+		public options?: any
+
+		constructor(name: string, pkg: string, options: any)
+
+		parse(code: string): Promise<any>
+		load(): Promise<string>
+		addURLDependency(dep: string): void
 	}
 
 	export = JSAsset
 }
 declare module 'parcel-bundler/src/utils/config'
-declare module 'parcel-bundler/src/utils/config'
 declare module 'parcel-bundler/src/WorkerFarm'
 declare module 'parcel-bundler/src/worker'
-declare module 'enhanced-resolve/lib/getInnerRequest' {
-	interface Request {
-		request?: Request;
-		relativePath: string;
-	}
-
-	type ResolverCallback = (request: Request, callback: Callback) => void
-
-	interface Callback {
-		(err?: Error, result?: any): void;
-
-		log?: any;
-		stack?: any;
-		missing?: any;
-	}
-
-	interface Resolver {
-		plugin(source: string, cb: ResolverCallback): void
-		doResolve(target: string, req: Request, desc: string, callback: Callback): void
-		join(relativePath: string, innerRequest: Request): Request;
-	}
-
-	function getInnerRequest(resolver: Resolver, request: Request): string
-
-	export = getInnerRequest
-}
-
+declare module 'parcel-bundler/src/Resolver'
+declare module 'parcel-bundler/src/Bundler'
 declare module 'normalize-path'
 
 declare module '@babel/code-frame' {

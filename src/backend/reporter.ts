@@ -1,5 +1,5 @@
 import {TypeCheckResult} from '../interfaces'
-import {formatDiagnostic} from './format'
+import {formatDiagnostics} from './format'
 
 export function reportDiagnostics(
 	{semanticDiagnostics, syntacticDiagnostics}: TypeCheckResult

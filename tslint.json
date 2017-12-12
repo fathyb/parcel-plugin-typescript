@@ -18,6 +18,7 @@
 		"indent": [true, "tabs"],
 		"no-namespace": false,
 		"arrow-parens": [true, "ban-single-arg-parens"],
-		"only-arrow-functions": false
+		"only-arrow-functions": false,
+		"max-classes-per-file": false
 	}
 }

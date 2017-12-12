@@ -8,7 +8,7 @@ import chalk from 'chalk'
 import normalizePath = require('normalize-path')
 import {Diagnostic, flattenDiagnosticMessageText} from 'typescript'
 
-export function formatDiagnostic(diagnostics: Diagnostic[], context: string): string {
+export function formatDiagnostics(diagnostics: Diagnostic[], context: string): string {
 	return diagnostics.map(diagnostic => {
 		const messageText = formatDiagnosticMessage(diagnostic, '', context)
 		const {file} = diagnostic

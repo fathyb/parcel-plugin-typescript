@@ -1,12 +1,9 @@
 import {inject} from './frontend/injector/master'
 
 export = (bundler: any) => {
-	if(bundler.farm !== null) {
-		throw new Error('invariant: farm should be null')
-	}
+	inject(bundler)
 
-	inject()
-
-	bundler.addAssetType('ts', require.resolve('./frontend/asset'))
-	bundler.addAssetType('tsx', require.resolve('./frontend/asset'))
+	bundler.addAssetType('js', require.resolve('./frontend/assets/virtual'))
+	bundler.addAssetType('ts', require.resolve('./frontend/assets/angular'))
+	bundler.addAssetType('tsx', require.resolve('./frontend/assets/angular'))
 }
