@@ -4,7 +4,11 @@ import {formatDiagnostic} from './format'
 export function reportDiagnostics(
 	{semanticDiagnostics, syntacticDiagnostics}: TypeCheckResult
 ): void {
-	const frame = formatDiagnostic(syntacticDiagnostics.concat(semanticDiagnostics), process.cwd())
+	const diagnostics = syntacticDiagnostics.concat(semanticDiagnostics)
 
-	console.error(frame)
+	if(diagnostics.length > 0 ) {
+		const frame = formatDiagnostic(diagnostics, process.cwd())
+
+		console.error(frame)
+	}
 }
