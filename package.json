@@ -1,6 +1,6 @@
 {
   "name": "parcel-plugin-typescript",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Complete TypeScript support for Parcel bundler",
   "author": "Fathy Boundjadj <fathy.boundjadj@gmail.com>",
   "license": "MIT",

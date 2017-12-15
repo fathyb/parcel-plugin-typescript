@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.2...v0.2.3) (2017-12-15)
+
+
+### Bug Fixes
+
+* **mappings:** fix es2015 import transformations ([bc9e6a4](https://github.com/fathyb/parcel-plugin-typescript/commit/bc9e6a4))
+* **resolve:** default moduleResolution to node ([b0d111d](https://github.com/fathyb/parcel-plugin-typescript/commit/b0d111d))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.1...v0.2.2) (2017-12-15)
 
