@@ -31,6 +31,7 @@ export = class TSAsset extends JSAsset {
 			dispatchCheckFile(this.name)
 
 			const transpiler = await this.transpiler.wait()
+
 			result = transpiler.transpile(code, this.name)
 		}
 

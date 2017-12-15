@@ -15,7 +15,9 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 						throw new Error('Expected child.moduleSpecifier to be StringLiteral')
 					}
 
-					specifier.text = resolve(specifier.text, options)
+					const resolved = resolve(specifier.text, options)
+
+					child.moduleSpecifier = ts.createLiteral(resolved)
 
 					return child
 				}
