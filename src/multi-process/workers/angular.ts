@@ -1,29 +1,25 @@
 import {AngularCompiler} from '../../backend/compiler/angular'
 import {FileStore} from '../../backend/compiler/store'
 import {ConfigurationLoader} from '../../backend/config-loader'
-import {NgVFSInvalidationResponse, NgVFSReadResponse, Request, Response} from '../message'
+import {Emitter} from '../../utils/emitter'
+
+import {
+	NgResourceRequest, NgVFSInvalidationResponse, NgVFSReadResponse, Request, Response
+} from '../message'
 
 const compilerCache = new Map<string, AngularCompiler>()
 
-process.on('message', async (data: Request) => {
+async function requestHandler(data: Request) {
 	const {id} = data
 
 	if(data.type === 'angular:compile') {
 		const {file, tsConfig} = data
-		let compiler = compilerCache.get(tsConfig)
+		const compiler = await getCompiler(tsConfig)
 
-		if(!compiler) {
-			compiler = await new ConfigurationLoader(
-				tsConfig, config => new AngularCompiler(config.path)
-			).wait()
+		const {sources, resources} = await compiler.transpile(file)
+		const response: Response = {id, type: data.type, sources, resources}
 
-			compilerCache.set(tsConfig, compiler)
-		}
-
-		const {sources} = await compiler.transpile('', file)
-		const response: Response = {id, type: data.type, sources}
-
-		process.send!(response)
+		sendResponse(response)
 	}
 	else if(data.type === 'angular:vfs:read') {
 		const {file} = data
@@ -33,13 +29,63 @@ process.on('message', async (data: Request) => {
 			type: data.type
 		}
 
-		process.send!(response)
+		sendResponse(response)
 	}
 	else if(data.type === 'angular:vfs:invalidate') {
 		FileStore.shared().invalidate(data.file)
 
-		process.send!({
+		sendResponse({
 			id, type: data.type
 		} as NgVFSInvalidationResponse)
 	}
+}
+
+const messageEmitter = new Emitter<Response>()
+
+process.on('message', (data: any) => {
+	if(data.request) {
+		requestHandler(data.request).catch(err => {
+			console.error(err)
+		})
+	}
+	else if(data.response) {
+		messageEmitter.emit(data.response)
+	}
 })
+
+function sendResponse(response: {}) {
+	process.send!({response})
+}
+
+let idCounter = 0
+async function compileResource(file: string): Promise<string> {
+	const id = idCounter++
+	const type = 'angular:resource:get'
+	const responsePromise = messageEmitter.once(message => message.id === id)
+
+	process.send!({
+		request: {id, file, type} as NgResourceRequest
+	})
+
+	const response = await responsePromise
+
+	if(response.type !== type) {
+		throw new Error('invariant error')
+	}
+
+	return response.content
+}
+
+async function getCompiler(config: string): Promise<AngularCompiler> {
+	let compiler = compilerCache.get(config)
+
+	if(!compiler) {
+		compiler = await new ConfigurationLoader(config, ({path}) =>
+			new AngularCompiler(path, compileResource)
+		).wait()
+
+		compilerCache.set(config, compiler)
+	}
+
+	return compiler
+}

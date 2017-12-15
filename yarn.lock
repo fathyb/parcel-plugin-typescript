@@ -2324,6 +2324,12 @@ macaddress@^0.2.8:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/macaddress/-/macaddress-0.2.8.tgz#5904dc537c39ec6dbefeae902327135fa8511f12"
 
+magic-string@^0.22.4:
+  version "0.22.4"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.22.4.tgz#31039b4e40366395618c1d6cf8193c53917475ff"
+  dependencies:
+    vlq "^0.2.1"
+
 map-cache@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/map-cache/-/map-cache-0.2.2.tgz#c32abd0bd6525d9b051645bb4f26ac5dc98a0dbf"
@@ -3144,7 +3150,7 @@ posthtml-parser@^0.1.3:
   dependencies:
     htmlparser2 "^3.8.3"
 
-posthtml-parser@^0.3.0:
+posthtml-parser@^0.3.0, posthtml-parser@~0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/posthtml-parser/-/posthtml-parser-0.3.0.tgz#af16ea406769f0f33d0011c48fac1f55502fca29"
   dependencies:
@@ -3158,6 +3164,13 @@ posthtml-render@^1.0.5, posthtml-render@^1.0.6:
 posthtml@^0.10.1:
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/posthtml/-/posthtml-0.10.1.tgz#029caa80591d2788ac1903dcf92352f46cec3cb5"
+  dependencies:
+    posthtml-parser "^0.3.0"
+    posthtml-render "^1.0.5"
+
+posthtml@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/posthtml/-/posthtml-0.11.0.tgz#312b00927438b979f448dd15c9191fdf09b7a185"
   dependencies:
     posthtml-parser "^0.3.0"
     posthtml-render "^1.0.5"
@@ -4131,6 +4144,10 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vlq@^0.2.1:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/vlq/-/vlq-0.2.3.tgz#8f3e4328cf63b1540c0d67e1b2778386f8975b26"
 
 vm-browserify@0.0.4:
   version "0.0.4"

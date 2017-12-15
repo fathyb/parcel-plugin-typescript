@@ -12,8 +12,22 @@ export class CompilerHost implements ts.CompilerHost {
 		this.host = ts.createCompilerHost(options, this.setParentNodes)
 	}
 
-	public getSourceFile(fileName: string, languageVersion: ts.ScriptTarget): ts.SourceFile {
-		return this.store.readSource(fileName, languageVersion)
+	public getSourceFile(
+		fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void
+	): ts.SourceFile {
+		try {
+			return this.store.readSource(fileName, languageVersion)
+		}
+		catch(err) {
+			if(onError) {
+				onError(err.message || err)
+			}
+			else {
+				throw err
+			}
+
+			return undefined as any
+		}
 	}
 
 	public getDefaultLibFileName(options: ts.CompilerOptions): string {

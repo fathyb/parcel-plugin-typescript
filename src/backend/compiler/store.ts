@@ -59,10 +59,6 @@ export class FileStore {
 		const file = this.readFile(path)
 
 		if(!file) {
-			if(/\.ts$/.test(path) && !/\.d\.ts$/.test(path)) {
-				return this.readSource(path.replace(/\.ts$/, '.d.ts'), target)
-			}
-
 			throw new Error(`Cannot find file ${path}`)
 		}
 

@@ -2,28 +2,41 @@
 
 import {dirname, resolve} from 'path'
 
-import Resolver = require('parcel-bundler/src/Resolver')
-
 import {startIPCServer} from '../../multi-process/ipc/server'
 
 /**
- * This function patch the WorkerFrame properties to interecpt
- * all messages sent from the workers.
- * When a file is updated a message will be sent to the master
- * and then dispatched to the type-checking worker.
+ * When generating files on the fly (eg. Angular) we need to
+ * override Parcel cache and resolver for it to work properly
  */
 export function inject(bundler: any) {
-	if(Resolver.prototype.resolveInternal !== injectedResolver) {
-		Resolver.prototype.resolveInternal = injectedResolver
+	const {cache, resolver} = bundler
+
+	if(cache) {
+		const Cache = cache.constructor
+		const CacheWrite = Cache.prototype.write
+		const CacheRead = Cache.prototype.read
+
+		cache.write = function(this: any, file: string, data: any) {
+			if(/\.ng(factory)|(style)\.js$/.test(file) || /\.ts$/.test(file)) {
+				return Promise.resolve()
+			}
+
+			return CacheWrite.call(this, file, data)
+		}
+
+		cache.read = function(this: any, file: string) {
+			if(/\.ng(factory)|(style)\.js$/.test(file)) {
+				return Promise.resolve(null)
+			}
+
+			return CacheRead.call(this, file)
+		}
 	}
 
-	if(!process.send) {
-		startIPCServer(bundler)
-	}
-}
+	const Resolver = resolver.constructor
+	const ResolveInternal = Resolver.prototype.resolveInternal
 
-const injectedResolver = ((resolver: () => void) =>
-	function(this: any, path: string, parent: string, ...args: any[]) {
+	resolver.resolveInternal = function(this: any, path: string, parent: string, ...args: any[]) {
 		if(/\.ngfactory$/.test(path) || /\.ngstyle$/.test(path)) {
 			return resolve(dirname(parent), `${path}.js`)
 		}
@@ -31,6 +44,10 @@ const injectedResolver = ((resolver: () => void) =>
 			return resolve(dirname(parent), path)
 		}
 
-		return resolver.call(this, path, parent, ...args)
+		return ResolveInternal.call(this, path, parent, ...args)
 	}
-)(Resolver.prototype.resolveInternal)
+
+	if(!process.send) {
+		startIPCServer(bundler)
+	}
+}

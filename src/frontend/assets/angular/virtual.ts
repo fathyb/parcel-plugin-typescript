@@ -1,6 +1,6 @@
-import JSAsset = require('parcel-bundler/src/assets/JSAsset')
+import JSAsset = require('parcel-bundler/lib/assets/JSAsset')
 
-import {ReadVirtualFile} from '../../multi-process/ipc/client'
+import {ReadVirtualFile} from '../../../multi-process/ipc/client'
 
 export = class VirtualAsset extends JSAsset {
 	public async load(): Promise<string> {

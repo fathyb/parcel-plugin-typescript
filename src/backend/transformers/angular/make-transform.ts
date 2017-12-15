@@ -22,7 +22,6 @@ export function makeTransform(
 ): ts.TransformerFactory<ts.SourceFile> {
 	return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
 		const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
-
 			const ops: TransformOperation[] = standardTransform(sf)
 			const removeOps = ops
 				.filter(op => op.kind === OPERATION_KIND.Remove) as RemoveNodeOperation[]

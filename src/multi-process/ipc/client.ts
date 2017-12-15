@@ -42,7 +42,7 @@ export function ReadVirtualFile(file: string): Promise<string> {
 export async function request(req: Request): Promise<any> {
 	await loadPromise
 
-	const promise = messageEmitter.once(({id}) => req.id === id)
+	const promise = messageEmitter.once(({id, type}) => req.id === id && req.type === type)
 
 	ipc.of.ParcelPluginTypeScriptServer.emit('message', req)
 

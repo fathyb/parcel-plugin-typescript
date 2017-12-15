@@ -19,6 +19,7 @@
 		"no-namespace": false,
 		"arrow-parens": [true, "ban-single-arg-parens"],
 		"only-arrow-functions": false,
-		"max-classes-per-file": false
+		"max-classes-per-file": false,
+		"no-bitwise": false
 	}
 }

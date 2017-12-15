@@ -12,6 +12,7 @@ export interface AngularCompilationResponse extends WithId {
 		js: string
 		sourceMap?: string
 	}
+	resources: string[]
 }
 
 export interface NgVFSReadRequest extends WithId {
@@ -33,7 +34,18 @@ export interface NgVFSInvalidationResponse extends WithId {
 	type: 'angular:vfs:invalidate'
 }
 
+export interface NgResourceRequest extends WithId {
+	type: 'angular:resource:get'
+	file: string
+}
+
+export interface NgResourceResponse extends WithId {
+	type: 'angular:resource:get'
+	content: string
+}
+
 export type Request =
-	AngularCompilationRequest | NgVFSReadRequest | NgVFSInvalidationRequest
+	AngularCompilationRequest | NgVFSReadRequest | NgVFSInvalidationRequest | NgResourceRequest
+
 export type Response =
-	AngularCompilationResponse | NgVFSReadResponse | NgVFSInvalidationResponse
+	AngularCompilationResponse | NgVFSReadResponse | NgVFSInvalidationResponse | NgResourceResponse

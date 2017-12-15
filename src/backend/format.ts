@@ -3,57 +3,69 @@
 
 import {EOL} from 'os'
 
+import {Diagnostic} from '@angular/compiler-cli/src/transformers/api'
 import {codeFrameColumns, Location} from '@babel/code-frame'
+
 import chalk from 'chalk'
 import normalizePath = require('normalize-path')
-import {Diagnostic, flattenDiagnosticMessageText} from 'typescript'
+import * as ts from 'typescript'
 
-export function formatDiagnostics(diagnostics: Diagnostic[], context: string): string {
+export function formatDiagnostics(diagnostics: Array<ts.Diagnostic|Diagnostic>, context: string): string {
 	return diagnostics.map(diagnostic => {
-		const messageText = formatDiagnosticMessage(diagnostic, '', context)
-		const {file} = diagnostic
-		let message = messageText
-
-		if(file != null && diagnostic.start != null) {
-			const lineChar = file.getLineAndCharacterOfPosition(diagnostic.start)
-			const source = file.text || diagnostic.source
-			const start = {
-				line: lineChar.line + 1,
-				column: lineChar.character + 1
-			}
-			const location: Location = {start}
-			const red = chalk.red(`🚨  ${file.fileName}(${start.line},${start.column})`)
-
-			const messages = [`${red}\n${chalk.redBright(messageText)}`]
-
-			if(source != null) {
-				if(typeof diagnostic.length === 'number') {
-					const end = file.getLineAndCharacterOfPosition(diagnostic.start + diagnostic.length)
-
-					location.end = {
-						line: end.line + 1,
-						column: end.character + 1
-					}
-				}
-
-				const frame = codeFrameColumns(source, location, {
-					linesAbove: 1,
-					linesBelow: 1,
-					highlightCode: true
-				})
-
-				messages.push(
-					frame
-						.split('\n')
-						.map(str => `  ${str}`)
-						.join('\n')
-				)
-			}
-
-			message = messages.join('\n')
+		if(diagnostic.source === 'angular') {
+			console.log(diagnostic)
 		}
-		return message + EOL
+		else {
+			return formatTypeScriptDiagnostic(diagnostic as ts.Diagnostic, context)
+		}
 	}).join(EOL) + EOL
+}
+
+function formatTypeScriptDiagnostic(diagnostic: ts.Diagnostic, context: string) {
+	const messageText = formatDiagnosticMessage(diagnostic.messageText, '', context)
+	const {file} = diagnostic
+	let message = messageText
+
+	if(file != null && diagnostic.start != null) {
+		const lineChar = file.getLineAndCharacterOfPosition(diagnostic.start)
+		const source = file.text || diagnostic.source
+		const start = {
+			line: lineChar.line + 1,
+			column: lineChar.character + 1
+		}
+		const location: Location = {start}
+		const red = chalk.red(`🚨  ${file.fileName}(${start.line},${start.column})`)
+
+		const messages = [`${red}\n${chalk.redBright(messageText)}`]
+
+		if(source != null) {
+			if(typeof diagnostic.length === 'number') {
+				const end = file.getLineAndCharacterOfPosition(diagnostic.start + diagnostic.length)
+
+				location.end = {
+					line: end.line + 1,
+					column: end.character + 1
+				}
+			}
+
+			const frame = codeFrameColumns(source, location, {
+				linesAbove: 1,
+				linesBelow: 1,
+				highlightCode: true
+			})
+
+			messages.push(
+				frame
+					.split('\n')
+					.map(str => `  ${str}`)
+					.join('\n')
+			)
+		}
+
+		message = messages.join('\n')
+	}
+
+	return message + EOL
 }
 
 function replaceAbsolutePaths(message: string, context: string) {
@@ -62,6 +74,6 @@ function replaceAbsolutePaths(message: string, context: string) {
 	return message.replace(new RegExp(contextPath, 'g'), '.')
 }
 
-function formatDiagnosticMessage(diagnostic: Diagnostic, delimiter: string, context: string) {
-	return replaceAbsolutePaths(flattenDiagnosticMessageText(diagnostic.messageText, delimiter), context)
+function formatDiagnosticMessage(diagnostic: string|ts.DiagnosticMessageChain, delimiter: string, context: string) {
+	return replaceAbsolutePaths(ts.flattenDiagnosticMessageText(diagnostic, delimiter), context)
 }

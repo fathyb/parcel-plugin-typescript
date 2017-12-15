@@ -2,14 +2,11 @@ import * as ts from 'typescript'
 
 import {TranspileResult} from '../interfaces'
 
-import {replaceResources} from './transformers/angular/resources'
 import {PathTransform} from './transformers/paths'
 
 export class Transpiler {
 	private readonly compilerOptions: ts.CompilerOptions
-	private readonly transformers: Array<ts.TransformerFactory<ts.SourceFile>> = [
-		replaceResources(() => true)
-	]
+	private readonly transformers: Array<ts.TransformerFactory<ts.SourceFile>> = []
 
 	constructor({options}: ts.ParsedCommandLine) {
 		this.compilerOptions = options
