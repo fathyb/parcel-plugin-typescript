@@ -29,6 +29,12 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 }
 
 function resolve(modulePath: string, {paths, baseUrl}: ts.CompilerOptions): string {
+	let resolved = findModule(path.resolve(baseUrl, modulePath))
+
+	if(resolved) {
+		return resolved
+	}
+
 	if(paths) {
 		const mappings = Object
 			.keys(paths)
@@ -38,7 +44,8 @@ function resolve(modulePath: string, {paths, baseUrl}: ts.CompilerOptions): stri
 
 		for(const mapping of mappings) {
 			const local = modulePath.match(mapping.pattern)![1]
-			const resolved = findModule(mapping.target.replace(/\*/, local))
+
+			resolved = findModule(mapping.target.replace(/\*/, local))
 
 			if(resolved !== null) {
 				return resolved
