@@ -22,14 +22,17 @@ export class ConfigurationLoader<T> {
 				const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
 				const transpilerOptions = {
 					compilerOptions: {
-						module: 'commonjs',
-						jsx: 'preserve'
+						module: 'es2015',
+						moduleResolution: 'node'
 					}
 				} as any
 
 				// Overwrite default if config is found
 				if(tsconfig) {
-					transpilerOptions.compilerOptions = tsconfig.compilerOptions
+					transpilerOptions.compilerOptions = {
+						...transpilerOptions.compilerOptions,
+						...tsconfig.compilerOptions
+					}
 					transpilerOptions.files = tsconfig.files
 					transpilerOptions.include = tsconfig.include
 					transpilerOptions.exclude = tsconfig.exclude
