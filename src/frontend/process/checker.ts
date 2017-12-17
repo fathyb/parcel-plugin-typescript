@@ -19,7 +19,7 @@ export async function typeCheck(...files: string[]): Promise<TypeCheckResult[]> 
 	return files.map(file => {
 		const result = service.parse(file)
 
-		reportDiagnostics(result)
+		reportDiagnostics([...result.semanticDiagnostics, ...result.syntacticDiagnostics])
 
 		return result
 	})

@@ -7,18 +7,27 @@ import findUp = require('find-up')
 
 import {readFile} from '../utils/fs'
 
-const configCache = new Map<string, ParsedCommandLine>()
+export interface Configuration extends ParsedCommandLine {
+	path: string
+}
+
+const configCache = new Map<string, Configuration>()
 
 export class ConfigurationLoader<T> {
 	private readonly promise: Promise<T>
 
-	constructor(path: string, then: (config: ParsedCommandLine) => T) {
+	constructor(path: string, then: (config: Configuration) => T) {
 		this.promise = (async () => {
 			const cwd = dirname(path)
 			let options = configCache.get(cwd)
 
 			if(!options) {
 				const configPath = await findUp('tsconfig.json', {cwd})
+
+				if(!configPath) {
+					throw new Error('Cannot find tsconfig')
+				}
+
 				const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
 				const transpilerOptions = {
 					compilerOptions: {
@@ -40,7 +49,10 @@ export class ConfigurationLoader<T> {
 
 				transpilerOptions.compilerOptions.noEmit = false
 
-				options = parseJsonConfigFileContent(transpilerOptions, sys, process.cwd())
+				options = {
+					...parseJsonConfigFileContent(transpilerOptions, sys, process.cwd()),
+					path: configPath
+				}
 
 				configCache.set(cwd, options)
 			}

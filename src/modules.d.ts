@@ -1,48 +1,45 @@
-declare module 'parcel-bundler/src/assets/JSAsset' {
+declare module 'parcel-bundler/lib/assets/JSAsset' {
 	class JSAsset {
 		public name: string
 		public contents?: string
 		public options?: any
+		public package?: any
+		public dependencies: Map<string, string>
+		public depAssets: Map<string, any>
 
 		constructor(name: string, pkg: string, options: any)
 
 		parse(code: string): Promise<any>
+		load(): Promise<string>
+		addURLDependency(url: string, from?: string, opts?: {}): string
+		addDependency(url: string, opts: {}): string
+		collectDependencies(): void
 	}
 
 	export = JSAsset
 }
-declare module 'parcel-bundler/src/utils/config'
-declare module 'parcel-bundler/src/utils/config'
-declare module 'parcel-bundler/src/WorkerFarm'
-declare module 'parcel-bundler/src/worker'
-declare module 'enhanced-resolve/lib/getInnerRequest' {
-	interface Request {
-		request?: Request;
-		relativePath: string;
+declare module 'parcel-bundler/lib/assets/HTMLAsset' {
+	class JSAsset {
+		public name: string
+		public contents?: string
+		public options?: any
+		public package?: any
+		public parentBundle?: any
+		public dependencies: Map<string, string>
+		public depAssets: Map<string, any>
+
+		constructor(name: string, pkg: string, options: any)
+
+		parse(code: string): Promise<any>
+		process(): Promise<any>
+		load(): Promise<string>
 	}
 
-	type ResolverCallback = (request: Request, callback: Callback) => void
-
-	interface Callback {
-		(err?: Error, result?: any): void;
-
-		log?: any;
-		stack?: any;
-		missing?: any;
-	}
-
-	interface Resolver {
-		plugin(source: string, cb: ResolverCallback): void
-		doResolve(target: string, req: Request, desc: string, callback: Callback): void
-		join(relativePath: string, innerRequest: Request): Request;
-	}
-
-	function getInnerRequest(resolver: Resolver, request: Request): string
-
-	export = getInnerRequest
+	export = JSAsset
 }
-
 declare module 'normalize-path'
+declare module 'posthtml-parser'
+declare module 'posthtml/lib/api'
 
 declare module '@babel/code-frame' {
 	export interface LineAndColumn {
