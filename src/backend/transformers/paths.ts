@@ -31,6 +31,10 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 }
 
 function resolve(modulePath: string, {paths, baseUrl}: ts.CompilerOptions): string {
+	if(!baseUrl) {
+		return modulePath
+	}
+
 	let resolved = findModule(path.resolve(baseUrl, modulePath))
 
 	if(resolved) {
