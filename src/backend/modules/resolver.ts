@@ -1,14 +1,10 @@
 import {existsSync} from 'fs'
 
-const TS_EXTENSIONS = ['tsx', 'ts']
+const EXTENSIONS = ['', '.ts', '.tsx', '/index.ts', '/index.tsx']
 
 export function findModule(path: string): string|null {
-	if(/\.tsx?/.test(path)) {
-		return path
-	}
-
-	for(const extension of TS_EXTENSIONS) {
-		const resolved = `${path}.${extension}`
+	for(const extension of EXTENSIONS) {
+		const resolved = `${path}${extension}`
 
 		if(existsSync(resolved)) {
 			return resolved
