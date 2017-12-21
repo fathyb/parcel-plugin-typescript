@@ -1,6 +1,6 @@
 {
   "name": "parcel-plugin-typescript",
-  "version": "0.3.0-angular-aot.19",
+  "version": "0.3.0",
   "description": "Enhanced TypeScript support for Parcel bundler",
   "author": "Fathy Boundjadj <fathy.boundjadj@gmail.com>",
   "license": "MIT",
