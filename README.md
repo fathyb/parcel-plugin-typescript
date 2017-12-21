@@ -45,7 +45,7 @@ And that's it, z e r o configuration.
 ## Configuration
 
 You can pass a `parcelTsPluginOptions` object in your `tsconfig.json`, here are the defaults :
-```json
+```js
 {
   "compilerOptions": {
     // some TypeScript compilerOptions
