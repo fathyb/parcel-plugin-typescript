@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file. See [standa
 	- Experimental incremental AOT build on watch mode
 	- Decorators are removed in AOT for smaller builds
 - **Options**: you can now pass options to the plugin in `tsconfig.json`:
-  ```json
+  ```js
   {
 	  "compilerOptions": {
 		  "strict": true
