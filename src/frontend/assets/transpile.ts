@@ -1,3 +1,5 @@
-import {TranspileAsset} from './classes/transpile'
+import {MakeTranspileAsset, TranspileAsset} from './classes/transpile'
 
-export = TranspileAsset
+export = function(name: string, pkg: string, options: any): TranspileAsset {
+	return new (MakeTranspileAsset(name, pkg, options))()
+}

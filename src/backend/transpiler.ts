@@ -1,25 +1,25 @@
 import * as ts from 'typescript'
 
-import {TranspileResult} from '../interfaces'
+import {CompileResult} from '../interfaces'
 
-import {replaceResources} from './transformers/angular/resources'
 import {PathTransform} from './transformers/paths'
 
 export class Transpiler {
 	private readonly compilerOptions: ts.CompilerOptions
 	private readonly transformers: Array<ts.TransformerFactory<ts.SourceFile>> = []
 
-	constructor({options}: ts.ParsedCommandLine) {
+	constructor({options}: ts.ParsedCommandLine, transformers: Array<ts.TransformerFactory<ts.SourceFile>> = []) {
 		this.compilerOptions = options
-		this.transformers.push(PathTransform(options))
+
+		this.transformers.push(PathTransform(options), ...transformers)
 	}
 
-	public transpile(code: string, fileName: string, forPlatform: 'angular'|'other'): TranspileResult {
+	public transpile(code: string, fileName: string): CompileResult {
 		const {compilerOptions, transformers} = this
 		const {outputText: js, sourceMapText: sourceMap} = ts.transpileModule(code, {
 			compilerOptions, fileName,
 			transformers: {
-				before: [...transformers, ...(forPlatform === 'angular' ? [replaceResources(() => true)] : [])]
+				before: transformers
 			}
 		})
 

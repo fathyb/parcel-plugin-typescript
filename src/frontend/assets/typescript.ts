@@ -1,24 +1,29 @@
-import JSAsset = require('parcel-bundler/lib/assets/JSAsset')
-
 import {Configuration, loadConfiguration} from '../../backend/config-loader'
-import {CompileFile} from '../multi-process/ipc/client'
+import {IPCClient} from '../../backend/worker/client'
 
-export = class TSAsset extends JSAsset {
-	private readonly config: Promise<Configuration>
+import {JSAsset} from './js-asset'
 
-	constructor(name: string, pkg: string, options: any) {
-		super(name, pkg, options)
+export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
+	const {parser} = options
+	const Asset = parser.findParser('file.js') as typeof JSAsset
 
-		this.config = loadConfiguration(name)
-	}
+	return new (class TSAsset extends Asset {
+		private readonly config: Promise<Configuration>
 
-	public async parse() {
-		const config = await this.config
-		const result = await CompileFile(config.path, this.name, 'other')
+		constructor() {
+			super(name, pkg, options)
 
-		this.contents = result.sources.js
+			this.config = loadConfiguration(name)
+		}
 
-		// Parse result as ast format through babylon
-		return super.parse(this.contents)
-	}
+		public async parse() {
+			const config = await this.config
+			const result = await IPCClient.compile({file: this.name, tsConfig: config.path})
+
+			this.contents = result.sources.js
+
+			// Parse result as ast format through babylon
+			return super.parse(this.contents)
+		}
+	})()
 }

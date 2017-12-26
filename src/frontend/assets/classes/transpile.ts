@@ -1,30 +1,43 @@
-import JSAsset = require('parcel-bundler/lib/assets/JSAsset')
-
 import {Configuration, loadConfiguration} from '../../../backend/config-loader'
 import {Transpiler} from '../../../backend/transpiler'
 
-export class TranspileAsset extends JSAsset {
-	protected readonly config: Promise<Configuration>
-	private readonly transpiler: Promise<Transpiler>
+import {JSAsset} from '../js-asset'
 
-	constructor(name: string, pkg: string, options: any) {
-		super(name, pkg, options)
+export interface TranspileAsset extends JSAsset {
+	config: Promise<Configuration>
 
-		this.config = loadConfiguration(name)
-		this.transpiler = this.config.then(config => new Transpiler(config))
-	}
+	transpile(code: string): Promise<string>
+}
 
-	public async parse(code: string) {
-		this.contents = await this.transpile(code, 'other')
+export function MakeTranspileAsset(name: string, pkg: string, options: any): {new(): TranspileAsset} {
+	const {parser} = options
+	const Asset = parser.findParser('file.js') as typeof JSAsset
 
-		// Parse result as ast format through babylon
-		return super.parse(this.contents)
-	}
+	return class TSAsset extends Asset {
+		public readonly config: Promise<Configuration>
+		private readonly transpiler: Promise<Transpiler>
 
-	protected async transpile(code: string, platform: 'angular'|'other') {
-		const transpiler = await this.transpiler
-		const result = transpiler.transpile(code, this.name, platform)
+		constructor() {
+			super(name, pkg, options)
 
-		return result.sources.js
+			this.config = loadConfiguration(name)
+			this.transpiler = this.config.then(config => new Transpiler(config))
+		}
+
+		public async parse(code: string) {
+			const contents = await this.transpile(code)
+
+			this.contents = contents
+
+			// Parse result as ast format through babylon
+			return super.parse(this.contents)
+		}
+
+		public async transpile(code: string) {
+			const transpiler = await this.transpiler
+			const result = transpiler.transpile(code, this.name)
+
+			return result.sources.js
+		}
 	}
 }

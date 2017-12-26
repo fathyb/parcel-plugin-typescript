@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 
-import {TranspileResult} from '../../interfaces'
+import {CompileResult} from '../../interfaces'
 
 import {reportDiagnostics} from '../reporter'
 import {PathTransform} from '../transformers/paths'
@@ -21,7 +21,7 @@ export class TypeScriptCompiler {
 		this.transformers = [PathTransform(options)]
 	}
 
-	public compile(path: string): TranspileResult {
+	public compile(path: string): CompileResult {
 		const {program, transformers: before} = this
 
 		if(this.firstRun) {

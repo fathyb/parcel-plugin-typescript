@@ -7,6 +7,8 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 		public dependencies: Map<string, string>
 		public depAssets: Map<string, any>
 
+		protected isES6Module: boolean
+
 		constructor(name: string, pkg: string, options: any)
 
 		parse(code: string): Promise<any>
@@ -14,32 +16,19 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 		addURLDependency(url: string, from?: string, opts?: {}): string
 		addDependency(url: string, opts: {}): string
 		collectDependencies(): void
+		transform(): Promise<void>
+		pretransform(): Promise<void>
 	}
 
 	export = JSAsset
 }
-declare module 'parcel-bundler/lib/assets/HTMLAsset' {
-	class JSAsset {
-		public name: string
-		public contents?: string
-		public options?: any
-		public package?: any
-		public parentBundle?: any
-		public dependencies: Map<string, string>
-		public depAssets: Map<string, any>
-
-		constructor(name: string, pkg: string, options: any)
-
-		parse(code: string): Promise<any>
-		process(): Promise<any>
-		load(): Promise<string>
-	}
+declare module 'parcel-bundler/src/assets/JSAsset' {
+	import JSAsset = require('parcel-bundler/lib/assets/JSAsset')
 
 	export = JSAsset
 }
+
 declare module 'normalize-path'
-declare module 'posthtml-parser'
-declare module 'posthtml/lib/api'
 
 declare module '@babel/code-frame' {
 	export interface LineAndColumn {

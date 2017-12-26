@@ -1,14 +1,12 @@
-import {TypeCheckFile} from '../multi-process/ipc/client'
-import {TranspileAsset} from './classes/transpile'
+import {IPCClient} from '../../backend/worker/client'
+import {MakeTranspileAsset} from './classes/transpile'
 
-class TSAsset extends TranspileAsset {
-	protected async transpile(code: string) {
-		const {path} = await this.config
+export = function(name: string, pkg: string, options: any): any {
+	return new (class extends MakeTranspileAsset(name, pkg, options) {
+		public transpile(code: string) {
+			this.config.then(({path}) => IPCClient.typeCheck({file: this.name, tsConfig: path}))
 
-		TypeCheckFile(path, this.name)
-
-		return super.transpile(code, 'other')
-	}
+			return super.transpile(code)
+		}
+	})()
 }
-
-export = TSAsset

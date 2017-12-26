@@ -3,17 +3,19 @@
 		"target": "es6",
 		"module": "commonjs",
 
-		"types": ["node", "typescript"],
+		"types": ["node"],
 
 		"sourceMap": true,
 		"declaration": true,
 
+		"experimentalDecorators": true,
 		"strict": true,
 		"noImplicitAny": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"importHelpers": true,
 		"allowSyntheticDefaultImports": false,
+		"downlevelIteration": true,
 		"moduleResolution": "node",
 
 		"rootDir": "src",

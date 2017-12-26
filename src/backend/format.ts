@@ -3,22 +3,14 @@
 
 import {EOL} from 'os'
 
-import {Diagnostic} from '@angular/compiler-cli/src/transformers/api'
 import {codeFrameColumns, Location} from '@babel/code-frame'
 
 import chalk from 'chalk'
 import normalizePath = require('normalize-path')
 import * as ts from 'typescript'
 
-export function formatDiagnostics(diagnostics: Array<ts.Diagnostic|Diagnostic>, context: string): string {
-	return diagnostics.map(diagnostic => {
-		if(diagnostic.source === 'angular') {
-			console.log(diagnostic)
-		}
-		else {
-			return formatTypeScriptDiagnostic(diagnostic as ts.Diagnostic, context)
-		}
-	}).join(EOL) + EOL
+export function formatDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>, context: string): string {
+	return diagnostics.map(diagnostic => formatTypeScriptDiagnostic(diagnostic as ts.Diagnostic, context)).join(EOL) + EOL
 }
 
 function formatTypeScriptDiagnostic(diagnostic: ts.Diagnostic, context: string) {
