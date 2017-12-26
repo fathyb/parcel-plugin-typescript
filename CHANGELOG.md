@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.5"></a>
+## [0.2.5](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.4...v0.2.5) (2017-12-26)
+
+
+### Bug Fixes
+
+* **resolve:** correctly map directory indices ([a543347](https://github.com/fathyb/parcel-plugin-typescript/commit/a543347))
+
+
+
 <a name="0.2.4"></a>
 ## [0.2.4](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.3...v0.2.4) (2017-12-19)
 
