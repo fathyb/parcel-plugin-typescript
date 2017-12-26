@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.4...v0.3.0) (2017-12-21)
 
+**NOTE: do not use this release (it's not tagged as latest anyway), the Angular support will be moved out of this plugin in the next days, this plugin will only provide TypeScript support.**
+
 🎉 First Angular AOT support 🎉
 
 ### Features
