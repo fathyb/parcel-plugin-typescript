@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.3.0...v0.4.0) (2018-01-05)
+
+The Angular support has been moved to [`parcel-plugin-angular`](https://github.com/fathyb/parcel-plugin-angular). To improve stability a new IPC system is used.
+
+### Bug Fixes
+
+* **modules**: fix module ID mismatch ([#7](https://github.com/fathyb/parcel-plugin-typescript/issues/7))
+
 <a name="0.2.5"></a>
 # [0.2.5](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.2.4...v0.2.5) (2017-12-21)
 
