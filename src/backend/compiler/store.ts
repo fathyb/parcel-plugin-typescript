@@ -21,6 +21,10 @@ export class FileStore {
 	private readonly files: {[key: string]: string} = {}
 	private readonly sources: {[key: string]: ts.SourceFile} = {}
 
+	public exists(path: string): boolean {
+		return path in this.files
+	}
+
 	public readFile(path: string, onlyCache = false): string|undefined {
 		if(!/^\//.test(path)) {
 			throw new Error('Path should be absolute')
@@ -71,7 +75,7 @@ export class FileStore {
 			throw new Error(`Cannot find file ${path}`)
 		}
 
-		source = ts.createSourceFile(path, file, target)
+		source = ts.createSourceFile(path, file, target, true)
 
 		this.sources[path] = source
 
@@ -105,8 +109,6 @@ export class FileStore {
 			this.changedFiles.push(path)
 
 			delete this.sources[path]
-
-			this.files[path] = readFileSync(path, {encoding: 'utf-8'})
 		}
 	}
 

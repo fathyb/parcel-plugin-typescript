@@ -63,7 +63,7 @@ export class CompilerHost implements ts.CompilerHost {
 	}
 
 	public fileExists(path: string) {
-		return this.host.fileExists(path)
+		return this.store.exists(path) || this.host.fileExists(path)
 	}
 
 	private resolve(path: string) {
