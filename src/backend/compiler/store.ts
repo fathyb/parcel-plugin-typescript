@@ -105,9 +105,9 @@ export class FileStore {
 	}
 
 	public invalidate(path: string): void {
-		if(path in this.files) {
-			this.changedFiles.push(path)
+		this.changedFiles.push(path)
 
+		if(path in this.files) {
 			delete this.sources[path]
 		}
 	}
