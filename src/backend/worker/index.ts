@@ -1,4 +1,4 @@
-import {CompileRequest, CompileResult, Request, Response} from '../../interfaces'
+import {CompileRequest, CompileResult, Request, Response, TypeCheckResult} from '../../interfaces'
 import {HandlerMethod, Server, setSocketPath, Worker} from '../../ipc'
 
 export class TypeScriptWorker extends Worker<Request, Response> {
@@ -15,7 +15,7 @@ export class TypeScriptWorker extends Worker<Request, Response> {
 	}
 
 	@HandlerMethod
-	public typeCheck(data: CompileRequest): Promise<void> {
+	public typeCheck(data: CompileRequest): Promise<TypeCheckResult> {
 		return this.request('typeCheck', data)
 	}
 }

@@ -33,15 +33,15 @@ function getService(tsConfig: string): Promise<LanguageService> {
 }
 
 const handler: Handler<Request, Response> = {
-	async compile({file, tsConfig}) {
+	async compile({file, reportErrors, tsConfig}) {
 		const compiler = await getCompiler(tsConfig)
 
-		return compiler.compile(file)
+		return compiler.compile(file, reportErrors)
 	},
-	async typeCheck({file, tsConfig}) {
+	async typeCheck({file, reportErrors, tsConfig}) {
 		const service = await getService(tsConfig)
 
-		return service.check(file)
+		return service.check(file, reportErrors)
 	}
 }
 

@@ -18,12 +18,33 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 
 		public async parse() {
 			const config = await this.config
-			const result = await IPCClient.compile({file: this.name, tsConfig: config.path})
+			const reportErrors = !config.options.noEmitOnError
+			const result = await IPCClient.compile({
+				file: this.name, tsConfig: config.path,
+				reportErrors
+			})
+
+			if(!reportErrors) {
+				const {diagnostics} = result
+
+				if(diagnostics) {
+					console.error(diagnostics)
+
+					// tslint:disable:no-string-throw
+					throw 'TypeScript errors were found while compiling'
+				}
+			}
 
 			this.contents = result.sources.js
 
 			// Parse result as ast format through babylon
 			return super.parse(this.contents)
+		}
+
+		public generateErrorMessage(err: any) {
+			console.log('\n\nmessage : %s\n\n', err.message || err)
+
+			return err.message || err
 		}
 	})()
 }

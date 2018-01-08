@@ -1,20 +1,19 @@
-import {Diagnostic} from 'typescript'
+export interface TypeCheckResult {
+	// Preformatted to prevent circular references errors
+	diagnostics: null|string
+}
 
-export interface CompileResult {
+export interface CompileResult extends TypeCheckResult {
 	sources: {
 		js: string
 		sourceMap?: string
 	}
 }
 
-export interface TypeCheckResult {
-	syntacticDiagnostics: Diagnostic[]
-	semanticDiagnostics: Diagnostic[]
-}
-
 export interface CompileRequest {
 	file: string
 	tsConfig: string
+	reportErrors: boolean
 }
 
 export interface Request {
@@ -23,6 +22,6 @@ export interface Request {
 }
 
 export interface Response {
-	typeCheck: void
-	compile: CompileResult
+	typeCheck: TypeCheckResult
+	compile: CompileResult & TypeCheckResult
 }

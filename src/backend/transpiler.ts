@@ -24,7 +24,8 @@ export class Transpiler {
 		})
 
 		return {
-			sources: {js, sourceMap}
+			sources: {js, sourceMap},
+			diagnostics: null
 		}
 	}
 }
