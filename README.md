@@ -12,6 +12,11 @@ If you only need transpiling then this plugin might not be necessary. You can se
 
 This plugin is in it's early stage and may not be stable. This first stable version will be `1.0.0`.
 
+## Windows
+
+The plugin does not work on Windows yet, it may work with Bash On Windows.
+See [issue #12](https://github.com/fathyb/parcel-plugin-typescript/issues/12) for more informations.
+
 ## Features
 
 - Type checking: it checks your TypeScript code for errors in a separated process for speed
