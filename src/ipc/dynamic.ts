@@ -1,4 +1,6 @@
+import {join} from 'path'
 import {tmpNameSync} from 'tmp'
+import uuid = require('uuid/v1')
 
 export function setSocketPath(name: string): string {
 	const prop = envVarName(name)
@@ -8,7 +10,16 @@ export function setSocketPath(name: string): string {
 		return socket
 	}
 
-	return process.env[prop] = tmpNameSync()
+	let path: string|null = null
+
+	if(process.platform === 'win32') {
+		path = join('\\\\?\\pipe', process.cwd(), uuid())
+	}
+	else {
+		path = tmpNameSync()
+	}
+
+	return process.env[prop] = path
 }
 
 export function getSocketPath(name: string): string {

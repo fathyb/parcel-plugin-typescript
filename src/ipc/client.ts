@@ -1,23 +1,6 @@
-import rp = require('request-promise')
+import * as http from 'http'
 
 import {getSocketPath} from './dynamic'
-
-async function request<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(
-	name: string, endpoint: K, data: RQ[K]
-): Promise<RS[K]> {
-	const response: {result?: RS[K], error?: any} = await rp({
-		uri: `http://unix:${getSocketPath(name)}:/${endpoint}`,
-		method: 'POST',
-		body: {data},
-		json: true
-	})
-
-	if(response.error) {
-		throw new Error(response.error)
-	}
-
-	return response.result!
-}
 
 export type Keys<T, U> = (keyof T) & (keyof U)
 export type Client<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>> = {
@@ -30,4 +13,38 @@ export function Client<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(name: stri
 	keys.forEach(key => object[key] = data => request<RQ, RS>(name, key, data))
 
 	return object as Client<RQ, RS>
+}
+
+async function request<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(
+	name: string, endpoint: K, data: RQ[K]
+): Promise<RS[K]> {
+	return new Promise<RS[K]>((resolve, reject) => {
+		const serialized = JSON.stringify({data})
+		const req = http.request({
+			socketPath: getSocketPath(name),
+			path: `/${endpoint}`,
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Content-Length': Buffer.byteLength(serialized)
+			}
+		}, res => {
+			const chunks: string[] = []
+
+			res
+				.setEncoding('utf8')
+				.on('end', () => resolve(JSON.parse(chunks.join(''))))
+				.on('data', chunk =>
+					chunks.push(
+						Buffer.isBuffer(chunk)
+							? chunk.toString('utf-8')
+							: chunk
+					)
+				)
+		})
+
+		req.on('error', reject)
+		req.write(serialized)
+		req.end()
+	})
 }
