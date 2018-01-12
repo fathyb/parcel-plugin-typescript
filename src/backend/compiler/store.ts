@@ -108,6 +108,7 @@ export class FileStore {
 		this.changedFiles.push(path)
 
 		if(path in this.files) {
+			delete this.files[path]
 			delete this.sources[path]
 		}
 	}
