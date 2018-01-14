@@ -17,6 +17,8 @@ This plugin is in it's early stage and may not be stable. This first stable vers
 - Type checking: it checks your TypeScript code for errors in a separated process for speed
 - Path mappings: it rewrites your `import` on the fly accordingly to your `paths` and `baseUrl` compiler options
 
+Looking for the Angular support? It has been moved to [`parcel-plugin-angular`](https://github.com/fathyb/parcel-plugin-angular).
+
 ### Coming features
 
 - TSLint support
