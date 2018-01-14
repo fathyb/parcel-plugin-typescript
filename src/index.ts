@@ -2,6 +2,10 @@ import {TypeScriptServer} from './backend/worker/index'
 import {getPluginConfig} from './utils/environment'
 
 export = (bundler: any) => {
+	if(process.env['PARCEL_PLUGIN_TYPESCRIPT_DISABLE'] === 'true') {
+		return
+	}
+
 	const {transpileOnly} = getPluginConfig()
 
 	if(transpileOnly) {
