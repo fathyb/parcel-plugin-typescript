@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.4.0...v0.5.0) (2018-01-14)
+
+
+### Bug Fixes
+
+* **ipc:** support Windows named pipes ([80334f7](https://github.com/fathyb/parcel-plugin-typescript/commit/80334f7)), closes [#12](https://github.com/fathyb/parcel-plugin-typescript/issues/12)
+* **tsc:** improve incremental build invalidation ([2196c0e](https://github.com/fathyb/parcel-plugin-typescript/commit/2196c0e))
+* **tsc:** invalidate contents along with AST ([d03c6a9](https://github.com/fathyb/parcel-plugin-typescript/commit/d03c6a9))
+* **tsc:** invalidate virtual files ([da22790](https://github.com/fathyb/parcel-plugin-typescript/commit/da22790))
+
+
+### Features
+
+* **error:** support `noEmitOnError` ([4d34626](https://github.com/fathyb/parcel-plugin-typescript/commit/4d34626)), closes [#9](https://github.com/fathyb/parcel-plugin-typescript/issues/9)
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.4.0...v0.4.1) (2018-01-07)
 
