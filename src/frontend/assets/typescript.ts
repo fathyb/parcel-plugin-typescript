@@ -42,9 +42,7 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 		}
 
 		public generateErrorMessage(err: any) {
-			console.log('\n\nmessage : %s\n\n', err.message || err)
-
-			return err.message || err
+			return err.stack || err.message || err
 		}
 	})()
 }
