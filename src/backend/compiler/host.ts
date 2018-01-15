@@ -2,14 +2,29 @@ import * as ts from 'typescript'
 
 import {FileStore} from './store'
 
-export class CompilerHost implements ts.CompilerHost {
-	public readonly store = FileStore.shared()
-	private readonly host: ts.CompilerHost
+export class Host {
+	protected readonly host: ts.CompilerHost
+	private readonly setParentNodes = true
 
-	private setParentNodes = true
-
-	constructor(options: ts.CompilerOptions) {
+	constructor(
+		options: ts.CompilerOptions,
+		public readonly store = FileStore.shared()
+	) {
 		this.host = ts.createCompilerHost(options, this.setParentNodes)
+	}
+
+	public fileExists(path: string) {
+		return this.store.exists(path) || this.host.fileExists(path)
+	}
+
+	public readFile(fileName: string) {
+		return this.store.readFile(fileName)
+	}
+}
+
+export class CompilerHost extends Host implements ts.CompilerHost {
+	public useCaseSensitiveFileNames(): boolean {
+		return this.host.useCaseSensitiveFileNames()
 	}
 
 	public getSourceFile(
@@ -34,10 +49,6 @@ export class CompilerHost implements ts.CompilerHost {
 		return this.host.getDefaultLibFileName(options)
 	}
 
-	public readFile(fileName: string) {
-		return this.store.readFile(fileName)
-	}
-
 	public writeFile(fileName: string, data: string) {
 		this.store.writeFile(fileName, data)
 	}
@@ -54,19 +65,33 @@ export class CompilerHost implements ts.CompilerHost {
 		return this.host.getCanonicalFileName(this.resolve(fileName))
 	}
 
-	public useCaseSensitiveFileNames(): boolean {
-		return this.host.useCaseSensitiveFileNames()
-	}
-
 	public getNewLine(): string {
 		return this.host.getNewLine()
 	}
 
-	public fileExists(path: string) {
-		return this.store.exists(path) || this.host.fileExists(path)
-	}
-
 	private resolve(path: string) {
 		return path
+	}
+}
+
+export class ConfigHost extends Host implements ts.ParseConfigHost {
+	public useCaseSensitiveFileNames = this.host.useCaseSensitiveFileNames()
+
+	constructor() {
+		super({}, new FileStore())
+	}
+
+	public getDeepFiles(): string[] {
+		return this.store.getFiles()
+	}
+
+	public readDirectory(
+		rootDir: string,
+		extensions: ReadonlyArray<string>,
+		excludes: ReadonlyArray<string> | undefined,
+		includes: ReadonlyArray<string>,
+		depth?: number
+	) {
+		return ts.sys.readDirectory(rootDir, extensions, excludes, includes, depth)
 	}
 }

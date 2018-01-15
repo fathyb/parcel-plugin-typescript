@@ -2,7 +2,7 @@ import {Request, Response} from '../../interfaces'
 import {Handler} from '../../ipc'
 
 import {TypeScriptCompiler} from '../compiler/tsc'
-import {loadConfiguration} from '../config-loader'
+import {loadConfiguration} from '../configuration'
 import {LanguageService} from '../service/index'
 
 const compilers = new Map<string, Promise<TypeScriptCompiler>>()

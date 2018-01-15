@@ -1,29 +1,43 @@
 import * as ts from 'typescript'
 
 import {CompileResult} from '../interfaces'
-import {Configuration, Transformers} from './config-loader'
+import {Configuration, Transformers} from './configuration'
+import {Dependencies, getTransformers} from './transformers'
 
 export class Transpiler {
-	private readonly compilerOptions: ts.CompilerOptions
+	private readonly dependencies: Dependencies = new Map()
+
 	private readonly transformers: Transformers
+	private readonly useTypeScriptAST: boolean
+	private readonly compilerOptions: ts.CompilerOptions
 
 	constructor(
-		{
-			typescript: {options},
-			plugin: {transformers}
-		}: Configuration
+		config: Configuration
 	) {
-		this.compilerOptions = options
-		this.transformers = transformers
+		this.compilerOptions = config.typescript.options
+
+		this.useTypeScriptAST = config.plugin.useTypeScriptAST
+		this.transformers = getTransformers(config, this.dependencies)
 	}
 
 	public transpile(code: string, fileName: string): CompileResult {
-		const {compilerOptions, transformers} = this
+		const {compilerOptions, transformers, useTypeScriptAST} = this
 		const {outputText: js, sourceMapText: sourceMap} = ts.transpileModule(code, {
-			compilerOptions, fileName, transformers
+			fileName,
+			transformers,
+			compilerOptions: {
+				...compilerOptions,
+				esModuleInterop: useTypeScriptAST
+					? true
+					: compilerOptions.esModuleInterop,
+				module: useTypeScriptAST
+					? ts.ModuleKind.CommonJS
+					: compilerOptions.module
+			}
 		})
 
 		return {
+			dependencies: this.dependencies.get(fileName) || [],
 			sources: {js, sourceMap},
 			diagnostics: null
 		}

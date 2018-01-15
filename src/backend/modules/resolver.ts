@@ -1,22 +1,49 @@
-import {statSync} from 'fs'
+import * as path from 'path'
+import * as ts from 'typescript'
 
-const EXTENSIONS = ['', '.ts', '.tsx', '/index.ts', '/index.tsx']
+export function resolve(
+	fileName: string, modulePath: string, rootDir: string,
+	options: ts.CompilerOptions, host: ts.ModuleResolutionHost
+): string {
+	let resolved = findModule(modulePath, fileName, rootDir, options, host)
 
-export function findModule(path: string): string|null {
-	for(const extension of EXTENSIONS) {
-		const resolved = `${path}${extension}`
+	if(path.isAbsolute(resolved)) {
+		const sourceDir = path.dirname(fileName)
 
-		try {
-			const stat = statSync(resolved)
+		resolved = path.relative(sourceDir, resolved)
 
-			if(stat.isFile() && !stat.isDirectory()) {
-				return resolved
-			}
-		}
-		catch {
-			continue
+		if(!/^\.\.?/.test(resolved)) {
+			resolved = `./${resolved}`
 		}
 	}
 
-	return null
+	return resolved
+}
+
+const cachePerRootDir = new Map<string, ts.ModuleResolutionCache>()
+
+function getModuleResolutionCache(root: string) {
+	let entry = cachePerRootDir.get(root)
+
+	if(entry) {
+		return entry
+	}
+
+	cachePerRootDir.set(root, entry = ts.createModuleResolutionCache(root, x => x))
+
+	return entry
+}
+
+function findModule(
+	modulePath: string, containingFile: string, rootDir: string,
+	options: ts.CompilerOptions, host: ts.ModuleResolutionHost
+): string {
+	const cache = getModuleResolutionCache(rootDir)
+	const {resolvedModule} = ts.resolveModuleName(modulePath, containingFile, options, host, cache)
+
+	if(resolvedModule && !resolvedModule.isExternalLibraryImport) {
+		return resolvedModule.resolvedFileName
+	}
+
+	return modulePath
 }

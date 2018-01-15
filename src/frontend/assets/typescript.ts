@@ -1,4 +1,4 @@
-import {Configuration, loadConfiguration} from '../../backend/config-loader'
+import {Configuration, loadConfiguration} from '../../backend/configuration'
 import {IPCClient} from '../../backend/worker/client'
 
 import {processSourceMaps} from '../../exports'
@@ -41,10 +41,6 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 
 			// Parse result as ast format through babylon
 			return super.parse(this.contents)
-		}
-
-		public generateErrorMessage(err: any) {
-			return err.stack || err.message || err
 		}
 	})()
 }

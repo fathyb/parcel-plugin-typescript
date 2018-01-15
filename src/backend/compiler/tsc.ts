@@ -1,12 +1,15 @@
 import * as ts from 'typescript'
 
 import {CompileResult} from '../../interfaces'
-import {Configuration, Transformers} from '../config-loader'
+import {Configuration, Transformers} from '../configuration'
 import {formatDiagnostics} from '../diagnostics'
+import {Dependencies, getTransformers} from '../transformers'
 import {CompilerHost} from './host'
 
 // This should only be used for non-watch build
 export class TypeScriptCompiler {
+	private readonly dependencies: Dependencies = new Map()
+
 	private readonly program: ts.Program
 	private readonly host: CompilerHost
 	private readonly transformers: Transformers
@@ -14,19 +17,16 @@ export class TypeScriptCompiler {
 	private firstRun = true
 
 	constructor(
-		{
-			typescript: {fileNames, options},
-			plugin: {transformers}
-		}: Configuration
+		config: Configuration
 	) {
 		const emitOptions = {
-			...options,
+			...config.typescript.options,
 			noEmitOnError: false
 		}
 
 		this.host = new CompilerHost(emitOptions)
-		this.program = ts.createProgram(fileNames, emitOptions, this.host)
-		this.transformers = transformers
+		this.program = ts.createProgram(config.typescript.fileNames, emitOptions, this.host)
+		this.transformers = getTransformers(config, this.dependencies, this.host)
 	}
 
 	public compile(path: string, reportErrors: boolean, root: string): CompileResult {
@@ -69,6 +69,7 @@ export class TypeScriptCompiler {
 		const sourceMap = host.store.readFile(filePath.replace(/\.js$/, '.js.map'))
 
 		return {
+			dependencies: this.dependencies.get(path) || [],
 			sources: {js, sourceMap},
 			diagnostics: diagnostics.length > 0
 				? formatted

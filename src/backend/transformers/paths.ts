@@ -1,111 +1,66 @@
-import * as path from 'path'
 import * as ts from 'typescript'
 
-import {findModule} from '../modules/resolver'
+import {resolve} from '../modules/resolver'
 
-// TODO: use options from the TransformationContext
-export function PathTransform(options: ts.CompilerOptions, baseDir: string): ts.TransformerFactory<ts.SourceFile> {
-	return function(context: ts.TransformationContext) {
-		return (node: ts.SourceFile) => {
-			if(options.baseUrl) {
-				ts.visitEachChild(node, child => {
-					if(ts.isImportDeclaration(child)) {
-						const specifier = child.moduleSpecifier
+export interface ImportDependency {
+	source: string
+	position: number
+}
 
-						if(!ts.isStringLiteral(specifier)) {
-							throw new Error('Expected child.moduleSpecifier to be StringLiteral')
-						}
+export const PathTransform = (
+	rootDir: string,
+	options: ts.CompilerOptions,
+	host: ts.ModuleResolutionHost,
+	dependencies?: Map<string, ImportDependency[]>|null
+): ts.TransformerFactory<ts.SourceFile> =>
+	(context: ts.TransformationContext) =>
+		(source: ts.SourceFile) => {
+			if(!options.baseUrl && !dependencies) {
+				return source
+			}
 
-						let resolved = resolve(specifier.text, baseDir, options)
-
-						if(path.isAbsolute(resolved)) {
-							const sourceDir = path.dirname(node.fileName)
-
-							resolved = path.relative(sourceDir, resolved)
-
-							if(!/^\./.test(resolved)) {
-								resolved = `./${resolved}`
-							}
-						}
-
-						child.moduleSpecifier = ts.createLiteral(resolved)
-
-						return child
+			return ts.visitNode(source, rootNode =>
+				ts.visitEachChild(rootNode, node => {
+					if(!ts.isImportDeclaration(node) && !ts.isExportDeclaration(node)) {
+						return node
 					}
 
-					return undefined
+					const specifier = node.moduleSpecifier
+
+					if(!specifier || !ts.isStringLiteral(specifier)) {
+						return node
+					}
+
+					const resolved = resolve(source.fileName, specifier.text, rootDir, options, host)
+
+					if(dependencies) {
+						const deps = dependencies.get(source.fileName)
+						const dep = {
+							source: resolved,
+							position: specifier.pos
+						}
+
+						if(deps) {
+							deps.push(dep)
+						}
+						else {
+							dependencies.set(source.fileName, [dep])
+						}
+					}
+
+					if((dependencies || options.baseUrl) && resolved !== specifier.text) {
+						const {decorators, modifiers} = node
+						const literal = ts.createLiteral(resolved)
+
+						if(ts.isExportDeclaration(node)) {
+							return ts.updateExportDeclaration(node, decorators, modifiers, node.exportClause, literal)
+						}
+						else {
+							return ts.updateImportDeclaration(node, decorators, modifiers, node.importClause, literal)
+						}
+					}
+
+					return node
 				}, context)
-			}
-
-			return node
+			)
 		}
-	}
-}
-
-function resolve(modulePath: string, baseDir: string, {paths, baseUrl}: ts.CompilerOptions): string {
-	if(!baseUrl) {
-		return modulePath
-	}
-
-	let resolved = findModule(path.resolve(baseUrl, modulePath))
-
-	if(resolved) {
-		return resolved
-	}
-
-	if(paths) {
-		const mappings = Object
-			.keys(paths)
-			.map(alias => getPathMappings(alias, paths[alias], baseDir, baseUrl))
-			.reduce((a, b) => a.concat(b), [])
-			.filter(mapping => mapping.pattern.test(modulePath))
-
-		for(const mapping of mappings) {
-			const local = modulePath.match(mapping.pattern)![1]
-
-			resolved = findModule(mapping.target.replace(/\*/, local))
-
-			if(resolved !== null) {
-				return resolved
-			}
-		}
-	}
-
-	return modulePath
-}
-
-interface PathMapping {
-	pattern: RegExp
-	moduleOnly: boolean
-	alias: string
-	target: string
-}
-
-function getPathMappings(alias: string, targets: string[], baseDir: string, baseUrl: string = '.'): PathMapping[] {
-	const absoluteBase = path.resolve(baseDir, baseUrl)
-
-	const moduleOnly = alias.indexOf('*') === -1
-	const escaped = escapeRegExp(alias)
-
-	return targets.map(relativeTarget => {
-		const target = path.resolve(absoluteBase, relativeTarget)
-		let pattern: RegExp
-
-		if(moduleOnly) {
-			pattern = new RegExp(`^${escaped}$`)
-		}
-		else {
-			const withStarCapturing = escaped.replace('\\*', '(.*)')
-
-			pattern = new RegExp(`^${withStarCapturing}`)
-		}
-
-		return {
-			moduleOnly, alias, pattern, target
-		}
-	})
-}
-
-function escapeRegExp(str: string) {
-	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')
-}

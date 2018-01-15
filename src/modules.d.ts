@@ -8,6 +8,7 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 		public package?: any
 		public dependencies: Map<string, string>
 		public depAssets: Map<string, any>
+		public isAstDirty: boolean
 
 		protected isES6Module: boolean
 
@@ -20,6 +21,8 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 		collectDependencies(): void
 		transform(): Promise<void>
 		pretransform(): Promise<void>
+		generate(): {js: string}
+		mightHaveDependencies(): boolean
 	}
 
 	export = JSAsset

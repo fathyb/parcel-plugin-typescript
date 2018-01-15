@@ -6,8 +6,8 @@ import commentsJson = require('comment-json')
 import findUp = require('find-up')
 import resolveFrom = require('resolve-from')
 
+import {ConfigHost} from '../exports'
 import {readFile} from '../utils/fs'
-import {PathTransform} from './transformers/paths'
 
 export type TransformerList = Array<ts.TransformerFactory<ts.SourceFile>>
 export interface Transformers {
@@ -17,10 +17,14 @@ export interface Transformers {
 
 export interface Configuration {
 	path: string | null
+	rootDir: string
+	configFiles: string[]
 	typescript: ts.ParsedCommandLine
 	plugin: {
 		transpileOnly: boolean
 		transformers: Transformers
+
+		useTypeScriptAST: boolean
 	}
 }
 
@@ -51,6 +55,7 @@ export async function loadConfiguration(path: string, rootDir: string): Promise<
 		} = {} as any,
 		'parcel-plugin-typescript': {
 			transpileOnly = false,
+			useTypeScriptAST = false,
 			transformers
 		} = {} as any
 	} = tsconfig
@@ -67,32 +72,43 @@ export async function loadConfiguration(path: string, rootDir: string): Promise<
 	const base = configPath
 		? dirname(configPath)
 		: rootDir
-	const typescript = ts.parseJsonConfigFileContent(tsconfig, ts.sys, base)
+	const host = new ConfigHost()
+	const typescript = ts.parseJsonConfigFileContent(tsconfig, host, base)
+	const files = host.getDeepFiles()
 
 	const config: Configuration = {
-		typescript,
+		typescript, rootDir,
+		path: configPath,
+		configFiles: configPath
+			? [configPath, ...files]
+			: files,
 		plugin: {
-			transpileOnly,
-			transformers: getTransformerFactory(typescript.options, base, transformers)
-		},
-		path: configPath
+			transpileOnly, useTypeScriptAST,
+			transformers: getTransformerFactory(base, transformers)
+		}
 	}
 
-	let {options} = config.typescript
-
-	config.typescript.options = options = {
+	config.typescript.options = {
 		module: ts.ModuleKind.CommonJS,
 		moduleResolution: ts.ModuleResolutionKind.NodeJs,
-		...options,
+		...config.typescript.options,
 		noEmit: false,
 		outDir: undefined
+	}
+
+	if(useTypeScriptAST) {
+		config.typescript.options = {
+			...config.typescript.options,
+			module: ts.ModuleKind.CommonJS,
+			esModuleInterop: true
+		}
 	}
 
 	return configCache[base] = config
 }
 
-function getTransformerFactory(options: ts.CompilerOptions, dir: string, transformers: any): Transformers {
-	const before: TransformerList = [PathTransform(options, dir)]
+function getTransformerFactory(dir: string, transformers: any): Transformers {
+	const before: TransformerList = []
 
 	if(transformers === undefined) {
 		return {before, after: []}

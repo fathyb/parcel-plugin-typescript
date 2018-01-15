@@ -1,4 +1,4 @@
-import {loadConfiguration} from './backend/config-loader'
+import {loadConfiguration} from './backend/configuration'
 import {TypeScriptServer} from './backend/worker/index'
 
 export = async (bundler: any) => {

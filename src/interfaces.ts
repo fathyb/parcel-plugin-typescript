@@ -8,6 +8,10 @@ export interface CompileResult extends TypeCheckResult {
 		js: string
 		sourceMap?: string
 	}
+	dependencies: null|Array<{
+		source: string
+		position: number
+	}>
 }
 
 export interface CompileRequest {
