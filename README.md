@@ -45,3 +45,10 @@ You can pass a `parcelTsPluginOptions` object in your `tsconfig.json` :
   }
 }
 ```
+
+## Sponsor
+
+If you have a couple bucks to spare here is three non-profit organizations I encourage you to help to build a better future :
+- [ChildFund](https://www.childfund.org/Ways-To-Donate)
+- [UN Women](https://donate.unwomen.org/now)
+- [Mozilla](https://donate.mozilla.org)
