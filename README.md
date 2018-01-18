@@ -6,23 +6,27 @@ Enhanced TypeScript integration for Parcel.
 
 ## Differences with Parcel native support
 
-Parcel has built-in transpiling support for TypeScript OOB. This plugin provides additionnal features listed in [Features](#features).
+While Parcel has built-in transpiling support for TypeScript, this plugin provides [additionnal features](#features).
 
 If you only need transpiling then this plugin might not be necessary. You can see this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
-This plugin is in it's early stage and may not be stable. This first stable version will be `1.0.0`.
+This plugin is in an early stage and may not be stable. This first stable version will be `1.0.0`.
 
 ## Features
 
-- Type checking: it checks your TypeScript code for errors in a separated process for speed
-- Path mappings: it rewrites your `import` on the fly accordingly to your `paths` and `baseUrl` compiler options
+- Type checking:  
+  Checking your TypeScript code for errors, in a separate process for speed.
+- Path mappings:  
+  Rewriting your `import` on the fly accordingly to your `paths` and `baseUrl` compiler options.
 
-Looking for the Angular support? It has been moved to [`parcel-plugin-angular`](https://github.com/fathyb/parcel-plugin-angular).
-
-### Coming features
+### Upcoming features
 
 - TSLint support
-- User defined AST transformers
+- User-defined AST transformers
+
+### Angular Support
+
+Angular support has been moved to [`parcel-plugin-angular`](https://github.com/fathyb/parcel-plugin-angular).
 
 ## Installation
 
@@ -34,7 +38,7 @@ or
 
 ## Configuration
 
-You can pass a `parcelTsPluginOptions` object in your `tsconfig.json` :
+For configuration, you can pass a `parcelTsPluginOptions` object in your `tsconfig.json`:
 ```js
 {
   "compilerOptions": {...},
@@ -48,7 +52,7 @@ You can pass a `parcelTsPluginOptions` object in your `tsconfig.json` :
 
 ## Sponsor
 
-If you have a couple bucks to spare here is three non-profit organizations I encourage you to help to build a better future :
+If you have a couple bucks to spare here are three non-profit organizations I encourage you to help to build a better future:
 - [ChildFund](https://www.childfund.org/Ways-To-Donate)
 - [UN Women](https://donate.unwomen.org/now)
 - [Mozilla](https://donate.mozilla.org)
