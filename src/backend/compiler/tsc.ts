@@ -14,9 +14,14 @@ export class TypeScriptCompiler {
 	private firstRun = true
 
 	constructor({fileNames, options}: ts.ParsedCommandLine) {
-		this.host = new CompilerHost(options)
-		this.program = ts.createProgram(fileNames, options, this.host)
-		this.transformers = [PathTransform(options)]
+		const emitOptions = {
+			...options,
+			noEmitOnError: false
+		}
+
+		this.host = new CompilerHost(emitOptions)
+		this.program = ts.createProgram(fileNames, emitOptions, this.host)
+		this.transformers = [PathTransform(emitOptions)]
 	}
 
 	public compile(path: string, reportErrors: boolean): CompileResult {
@@ -49,10 +54,11 @@ export class TypeScriptCompiler {
 			console.error(formatted)
 		}
 
-		const js = this.host.store.readFile(path.replace(/\.tsx?$/, '.js'))
+		const filePath = path.replace(/\.tsx?$/, '.js')
+		const js = this.host.store.readFile(filePath)
 
 		if(!js) {
-			throw new Error(`Cannot find virtual file "${path}"`)
+			throw new Error(`Cannot find virtual file "${filePath}"`)
 		}
 
 		return {
