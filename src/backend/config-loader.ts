@@ -46,6 +46,15 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 		transpilerOptions.exclude = tsconfig.exclude
 	}
 
+	const {typeRoots} = transpilerOptions.compilerOptions
+
+	if(typeRoots && Array.isArray(typeRoots)) {
+		transpilerOptions.include = [
+			...(transpilerOptions.include || []),
+			...typeRoots.map((root: string) => `${root.replace(/\/*$/, '')}/**/*`)
+		]
+	}
+
 	transpilerOptions.compilerOptions.noEmit = false
 	delete transpilerOptions.compilerOptions.outDir
 
