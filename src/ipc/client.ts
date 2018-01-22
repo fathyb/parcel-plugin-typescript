@@ -33,7 +33,16 @@ async function request<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(
 
 			res
 				.setEncoding('utf8')
-				.on('end', () => resolve(JSON.parse(chunks.join('')).result))
+				.on('end', () => {
+					const {error, result} = JSON.parse(chunks.join(''))
+
+					if(error) {
+						reject(new Error(error))
+					}
+					else {
+						resolve(result)
+					}
+				})
 				.on('data', chunk =>
 					chunks.push(
 						Buffer.isBuffer(chunk)
