@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.5.2...v0.5.3) (2018-01-22)
+
+
+### Bug Fixes
+
+* **ipc:** correctly report request errors ([1025549](https://github.com/fathyb/parcel-plugin-typescript/commit/1025549))
+* **tsc:** show diagnostics with `noEmitOnError` ([d0ac215](https://github.com/fathyb/parcel-plugin-typescript/commit/d0ac215))
+* **tsc:** support `typeRoots` ([d903223](https://github.com/fathyb/parcel-plugin-typescript/commit/d903223)), closes [#19](https://github.com/fathyb/parcel-plugin-typescript/issues/19)
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.5.1...v0.5.2) (2018-01-14)
 
