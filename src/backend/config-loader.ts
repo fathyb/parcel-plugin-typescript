@@ -51,7 +51,7 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 	if(typeRoots && Array.isArray(typeRoots)) {
 		transpilerOptions.include = [
 			...(transpilerOptions.include || []),
-			...typeRoots.map((root: string) => `${root.replace(/\/*$/, '')}/**/*`)
+			...typeRoots.map((root: string) => `${root.replace(/(\/|\\)*$/, '')}/**/*`)
 		]
 	}
 
