@@ -53,7 +53,6 @@ export class FileStore {
 			file = readFileSync(path, {encoding: 'utf-8'})
 		}
 		catch(_) {
-
 			return
 		}
 

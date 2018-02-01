@@ -1,6 +1,7 @@
 import {Configuration, loadConfiguration} from '../../backend/config-loader'
 import {IPCClient} from '../../backend/worker/client'
 
+import {processSourceMaps} from '../../exports'
 import {JSAsset} from './js-asset'
 
 export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
@@ -16,7 +17,7 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 			this.config = loadConfiguration(name)
 		}
 
-		public async parse() {
+		public async parse(): Promise<any> {
 			const config = await this.config
 			const reportErrors = !config.options.noEmitOnError
 			const result = await IPCClient.compile({
@@ -35,7 +36,7 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 				}
 			}
 
-			this.contents = result.sources.js
+			this.contents = processSourceMaps(this, result.sources).js
 
 			// Parse result as ast format through babylon
 			return super.parse(this.contents)

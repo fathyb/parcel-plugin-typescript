@@ -25,7 +25,7 @@ export class TypeScriptCompiler {
 	}
 
 	public compile(path: string, reportErrors: boolean): CompileResult {
-		const {program, transformers: before} = this
+		const {program, transformers: before, host} = this
 		const diagnostics: ts.Diagnostic[] = []
 
 		if(this.firstRun) {
@@ -55,14 +55,16 @@ export class TypeScriptCompiler {
 		}
 
 		const filePath = path.replace(/\.tsx?$/, '.js')
-		const js = this.host.store.readFile(filePath)
+		const js = host.store.readFile(filePath)
 
 		if(!js) {
 			throw new Error(`Cannot find virtual file "${filePath}"`)
 		}
 
+		const sourceMap = host.store.readFile(filePath.replace(/\.js$/, '.js.map'))
+
 		return {
-			sources: {js},
+			sources: {js, sourceMap},
 			diagnostics: diagnostics.length > 0
 				? formatted
 				: null
