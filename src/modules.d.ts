@@ -1,7 +1,9 @@
 declare module 'parcel-bundler/lib/assets/JSAsset' {
 	class JSAsset {
 		public name: string
+		public relativeName: string
 		public contents?: string
+		public sourceMap?: any
 		public options?: any
 		public package?: any
 		public dependencies: Map<string, string>

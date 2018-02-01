@@ -1,5 +1,6 @@
 import {Configuration, loadConfiguration} from '../../../backend/config-loader'
 import {Transpiler} from '../../../backend/transpiler'
+import {CompileResult} from '../../../interfaces'
 
 import {JSAsset} from '../js-asset'
 
@@ -33,11 +34,27 @@ export function MakeTranspileAsset(name: string, pkg: string, options: any): {ne
 			return super.parse(this.contents)
 		}
 
-		public async transpile(code: string) {
+		public async transpile(code: string): Promise<string> {
 			const transpiler = await this.transpiler
-			const result = transpiler.transpile(code, this.name)
+			const {sources} = transpiler.transpile(code, this.name)
 
-			return result.sources.js
+			return processSourceMaps(this, sources).js
 		}
 	}
+}
+
+export function processSourceMaps<T extends CompileResult['sources']>(asset: JSAsset, sources: T): T {
+	if(sources.sourceMap) {
+		const sourceMapObject = JSON.parse(sources.sourceMap)
+
+		sourceMapObject.sources = [asset.relativeName]
+		sourceMapObject.sourcesContent = [asset.contents]
+
+		asset.sourceMap = sourceMapObject
+
+		// Remove the source map URL
+		sources.js = sources.js.substring(0, sources.js.lastIndexOf('//# sourceMappingURL'))
+	}
+
+	return sources
 }
