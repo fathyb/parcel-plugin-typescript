@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.5.3...v0.6.0) (2018-02-11)
+
+
+### Bug Fixes
+
+* **config-loader:** parse Windows separators ([0fa26cb](https://github.com/fathyb/parcel-plugin-typescript/commit/0fa26cb))
+
+
+### Features
+
+* **asset:** support source maps 🎉 ([9db110a](https://github.com/fathyb/parcel-plugin-typescript/commit/9db110a)), closes [#25](https://github.com/fathyb/parcel-plugin-typescript/issues/25)
+
+
+
 <a name="0.5.3"></a>
 ## [0.5.3](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.5.2...v0.5.3) (2018-01-22)
 
