@@ -18,7 +18,7 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 
 						let resolved = resolve(specifier.text, options)
 
-						if(/^\//.test(resolved)) {
+						if(path.isAbsolute(resolved)) {
 							const sourceDir = path.dirname(node.fileName)
 
 							resolved = path.relative(sourceDir, resolved)

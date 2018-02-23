@@ -1,3 +1,5 @@
+import {isAbsolute} from 'path'
+
 import {readFileSync} from 'fs'
 import * as ts from 'typescript'
 
@@ -26,7 +28,9 @@ export class FileStore {
 	}
 
 	public readFile(path: string, onlyCache = false): string|undefined {
-		if(!/^\//.test(path)) {
+		path = path.replace(/\\/g, '/')
+
+		if(!isAbsolute(path)) {
 			throw new Error('Path should be absolute')
 		}
 
@@ -89,7 +93,7 @@ export class FileStore {
 	}
 
 	public writeFile(path: string, contents: string) {
-		if(!/^\//.test(path)) {
+		if(!isAbsolute(path)) {
 			throw new Error('Path should be absolute')
 		}
 
@@ -99,7 +103,7 @@ export class FileStore {
 	}
 
 	public getDirectories(path = '/'): string[] {
-		if(!/^\//.test(path)) {
+		if(!isAbsolute(path)) {
 			throw new Error('Path should be absolute')
 		}
 
