@@ -1,13 +1,13 @@
 import {dirname} from 'path'
 
-import {ParsedCommandLine, parseJsonConfigFileContent, sys} from 'typescript'
+import * as ts from 'typescript'
 
 import commentsJson = require('comment-json')
 import findUp = require('find-up')
 
 import {readFile} from '../utils/fs'
 
-export interface Configuration extends ParsedCommandLine {
+export interface Configuration extends ts.ParsedCommandLine {
 	path: string
 }
 
@@ -28,42 +28,33 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 	}
 
 	const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
-	const transpilerOptions = {
-		compilerOptions: {
-			module: 'es2015',
-			moduleResolution: 'node'
-		}
-	} as any
 
-	// Overwrite default if config is found
-	if(tsconfig) {
-		transpilerOptions.compilerOptions = {
-			...transpilerOptions.compilerOptions,
-			...tsconfig.compilerOptions
-		}
-		transpilerOptions.files = tsconfig.files
-		transpilerOptions.include = tsconfig.include
-		transpilerOptions.exclude = tsconfig.exclude
-	}
-
-	const {typeRoots} = transpilerOptions.compilerOptions
+	// TODO: use the ParsedCommandLine for the type roots
+	const {typeRoots} = tsconfig
 
 	if(typeRoots && Array.isArray(typeRoots)) {
-		transpilerOptions.include = [
-			...(transpilerOptions.include || []),
+		tsconfig.include = [
+			...(tsconfig.include || []),
 			...typeRoots.map((root: string) => `${root.replace(/(\/|\\)*$/, '')}/**/*`)
 		]
 	}
 
-	transpilerOptions.compilerOptions.noEmit = false
-	delete transpilerOptions.compilerOptions.outDir
-
-	const options = {
-		...parseJsonConfigFileContent(transpilerOptions, sys, process.cwd()),
+	const config = {
+		...ts.parseJsonConfigFileContent(tsconfig, ts.sys, dirname(configPath)),
 		path: configPath
 	}
 
-	configCache[dirname(configPath)] = options
+	let {options} = config
 
-	return options
+	config.options = options = {
+		module: ts.ModuleKind.CommonJS,
+		moduleResolution: ts.ModuleResolutionKind.NodeJs,
+		...options,
+		noEmit: false,
+		outDir: undefined
+	}
+
+	configCache[dirname(configPath)] = config
+
+	return config
 }
