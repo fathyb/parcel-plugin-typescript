@@ -31,11 +31,18 @@ export class FileStore {
 		}
 
 		const {files} = this
-		let file = files[path]
 
-		if(typeof file === 'string') {
-			return file
+		if(path in files) {
+			return files[path]
 		}
+
+		const jsxPath = path + 'x'
+
+		if(jsxPath in files) {
+			return files[jsxPath]
+		}
+
+		let file: string | null = null
 
 		if(/\.ngfactory\.ts$/.test(path)) {
 			file = files[path.replace(/\.ts$/, '.d.ts')]
