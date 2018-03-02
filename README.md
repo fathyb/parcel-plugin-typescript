@@ -18,11 +18,12 @@ This plugin is in an early stage and may not be stable. This first stable versio
   Checking your TypeScript code for errors, in a separate process for speed.
 - Path mappings:  
   Rewriting your `import` on the fly accordingly to your `paths` and `baseUrl` compiler options.
+- Custom AST transformers:
+  Use your own TypeScript transformers
 
 ### Upcoming features
 
 - TSLint support
-- User-defined AST transformers
 
 ### Angular Support
 
@@ -49,10 +50,3 @@ For configuration, you can pass a `parcelTsPluginOptions` object in your `tsconf
   }
 }
 ```
-
-## Sponsor
-
-If you have a couple bucks to spare here are three non-profit organizations I encourage you to help to build a better future:
-- [ChildFund](https://www.childfund.org/Ways-To-Donate)
-- [UN Women](https://donate.unwomen.org/now)
-- [Mozilla](https://donate.mozilla.org)

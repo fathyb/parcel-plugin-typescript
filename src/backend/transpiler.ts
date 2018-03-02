@@ -1,26 +1,26 @@
 import * as ts from 'typescript'
 
 import {CompileResult} from '../interfaces'
-
-import {PathTransform} from './transformers/paths'
+import {Configuration, Transformers} from './config-loader'
 
 export class Transpiler {
 	private readonly compilerOptions: ts.CompilerOptions
-	private readonly transformers: Array<ts.TransformerFactory<ts.SourceFile>> = []
+	private readonly transformers: Transformers
 
-	constructor({options}: ts.ParsedCommandLine, transformers: Array<ts.TransformerFactory<ts.SourceFile>> = []) {
+	constructor(
+		{
+			typescript: {options},
+			plugin: {transformers}
+		}: Configuration
+	) {
 		this.compilerOptions = options
-
-		this.transformers.push(PathTransform(options), ...transformers)
+		this.transformers = transformers
 	}
 
 	public transpile(code: string, fileName: string): CompileResult {
 		const {compilerOptions, transformers} = this
 		const {outputText: js, sourceMapText: sourceMap} = ts.transpileModule(code, {
-			compilerOptions, fileName,
-			transformers: {
-				before: transformers
-			}
+			compilerOptions, fileName, transformers
 		})
 
 		return {

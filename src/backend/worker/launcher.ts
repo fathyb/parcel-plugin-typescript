@@ -12,7 +12,9 @@ function getCompiler(tsConfig: string): Promise<TypeScriptCompiler> {
 	let compiler = compilers.get(tsConfig)
 
 	if(!compiler) {
-		compiler = loadConfiguration(tsConfig).then(config => new TypeScriptCompiler(config))
+		compiler = loadConfiguration(tsConfig).then(config =>
+			new TypeScriptCompiler(config)
+		)
 
 		compilers.set(tsConfig, compiler)
 	}
@@ -24,7 +26,9 @@ function getService(tsConfig: string): Promise<LanguageService> {
 	let service = services.get(tsConfig)
 
 	if(!service) {
-		service = loadConfiguration(tsConfig).then(config => new LanguageService(config))
+		service = loadConfiguration(tsConfig).then(({typescript}) =>
+			new LanguageService(typescript)
+		)
 
 		services.set(tsConfig, service)
 	}
