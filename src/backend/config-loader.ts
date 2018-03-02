@@ -4,10 +4,23 @@ import * as ts from 'typescript'
 
 import commentsJson = require('comment-json')
 import findUp = require('find-up')
+import resolveFrom = require('resolve-from')
 
+import {PathTransform} from '../exports'
 import {readFile} from '../utils/fs'
 
-export interface Configuration extends ts.ParsedCommandLine {
+export type TransformerList = Array<ts.TransformerFactory<ts.SourceFile>>
+export interface Transformers {
+	before: TransformerList
+	after?: TransformerList
+}
+
+export interface Configuration {
+	typescript: ts.ParsedCommandLine
+	plugin: {
+		transpileOnly: boolean
+		transformers: Transformers
+	}
 	path: string
 }
 
@@ -30,23 +43,40 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 	const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
 
 	// TODO: use the ParsedCommandLine for the type roots
-	const {typeRoots} = tsconfig
+	// TODO: "parcelTsPluginOptions" makes my eyes bleed
+	const {
+		compilerOptions: {
+			typeRoots
+		} = {} as any,
+		parcelTsPluginOptions: {
+			transpileOnly = false,
+			transformers
+		} = {} as any
+	} = tsconfig
 
 	if(typeRoots && Array.isArray(typeRoots)) {
 		tsconfig.include = [
 			...(tsconfig.include || []),
-			...typeRoots.map((root: string) => `${root.replace(/(\/|\\)*$/, '')}/**/*`)
+			...typeRoots.map((root: string) =>
+				`${root.replace(/(\/|\\)*$/, '')}/**/*`
+			)
 		]
 	}
 
-	const config = {
-		...ts.parseJsonConfigFileContent(tsconfig, ts.sys, dirname(configPath)),
+	const base = dirname(configPath)
+	const typescript = ts.parseJsonConfigFileContent(tsconfig, ts.sys, base)
+	const config: Configuration = {
+		typescript,
+		plugin: {
+			transpileOnly,
+			transformers: getTransformerFactory(typescript.options, base, transformers)
+		},
 		path: configPath
 	}
 
-	let {options} = config
+	let {options} = config.typescript
 
-	config.options = options = {
+	config.typescript.options = options = {
 		module: ts.ModuleKind.CommonJS,
 		moduleResolution: ts.ModuleResolutionKind.NodeJs,
 		...options,
@@ -54,7 +84,50 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 		outDir: undefined
 	}
 
-	configCache[dirname(configPath)] = config
+	return configCache[base] = config
+}
 
-	return config
+function getTransformerFactory(options: ts.CompilerOptions, dir: string, transformers: any): Transformers {
+	const before: TransformerList = [PathTransform(options)]
+
+	if(transformers === undefined) {
+		return {before, after: []}
+	}
+
+	if(typeof transformers !== 'string') {
+		throw new Error('The transformers option should be a string')
+	}
+
+	const factoryPath = resolveFrom(dir, transformers)
+	let factory = require(factoryPath)
+
+	if(!factory) {
+		throw new Error('Cannot import transformer factory')
+	}
+
+	if(factory.default) {
+		factory = factory.default
+	}
+
+	factory = factory()
+
+	if(factory.before) {
+		if(!Array.isArray(factory.before)) {
+			throw new Error('Factory.before should be a TransformerFactory array')
+		}
+
+		before.push(...factory.before)
+	}
+
+	let after: TransformerList | undefined
+
+	if(factory.after) {
+		if(!Array.isArray(factory.after)) {
+			throw new Error('Factory.after should be a TransformerFactory array')
+		}
+
+		after = factory.after
+	}
+
+	return {before, after}
 }

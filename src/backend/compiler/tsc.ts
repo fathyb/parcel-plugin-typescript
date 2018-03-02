@@ -1,19 +1,24 @@
 import * as ts from 'typescript'
 
 import {CompileResult} from '../../interfaces'
+import {Configuration, Transformers} from '../config-loader'
 import {formatDiagnostics} from '../format'
-import {PathTransform} from '../transformers/paths'
 import {CompilerHost} from './host'
 
 // This should only be used for non-watch build
 export class TypeScriptCompiler {
 	private readonly program: ts.Program
 	private readonly host: CompilerHost
-	private readonly transformers: Array<ts.TransformerFactory<ts.SourceFile>>
+	private readonly transformers: Transformers
 
 	private firstRun = true
 
-	constructor({fileNames, options}: ts.ParsedCommandLine) {
+	constructor(
+		{
+			typescript: {fileNames, options},
+			plugin: {transformers}
+		}: Configuration
+	) {
 		const emitOptions = {
 			...options,
 			noEmitOnError: false
@@ -21,11 +26,11 @@ export class TypeScriptCompiler {
 
 		this.host = new CompilerHost(emitOptions)
 		this.program = ts.createProgram(fileNames, emitOptions, this.host)
-		this.transformers = [PathTransform(emitOptions)]
+		this.transformers = transformers
 	}
 
 	public compile(path: string, reportErrors: boolean): CompileResult {
-		const {program, transformers: before, host} = this
+		const {program, transformers, host} = this
 		const diagnostics: ts.Diagnostic[] = []
 
 		if(this.firstRun) {
@@ -40,7 +45,7 @@ export class TypeScriptCompiler {
 			throw new Error(`Cannot find source file "${path}"`)
 		}
 
-		const result = program.emit(sourceFile, undefined, undefined, false, {before})
+		const result = program.emit(sourceFile, undefined, undefined, false, transformers)
 
 		diagnostics.push(
 			...result.diagnostics,

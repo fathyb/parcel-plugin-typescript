@@ -5,7 +5,7 @@ export = function(name: string, pkg: string, options: any): any {
 	return new (class extends MakeTranspileAsset(name, pkg, options) {
 		public async transpile(code: string) {
 			const config = await this.config
-			const reportErrors = !config.options.noEmitOnError
+			const reportErrors = !config.typescript.options.noEmitOnError
 			const checkPromise = IPCClient.typeCheck({
 				file: this.name, tsConfig: config.path,
 				reportErrors

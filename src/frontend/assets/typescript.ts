@@ -19,7 +19,7 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 
 		public async parse(): Promise<any> {
 			const config = await this.config
-			const reportErrors = !config.options.noEmitOnError
+			const reportErrors = !config.typescript.options.noEmitOnError
 			const result = await IPCClient.compile({
 				file: this.name, tsConfig: config.path,
 				reportErrors

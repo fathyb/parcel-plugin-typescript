@@ -22,13 +22,13 @@ export function MakeTranspileAsset(name: string, pkg: string, options: any): {ne
 			super(name, pkg, options)
 
 			this.config = loadConfiguration(name)
-			this.transpiler = this.config.then(config => new Transpiler(config))
+			this.transpiler = this.config.then(config =>
+				new Transpiler(config)
+			)
 		}
 
 		public async parse(code: string) {
-			const contents = await this.transpile(code)
-
-			this.contents = contents
+			this.contents = await this.transpile(code)
 
 			// Parse result as ast format through babylon
 			return super.parse(this.contents)

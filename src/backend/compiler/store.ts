@@ -11,9 +11,7 @@ export class FileStore {
 			return sharedInstance
 		}
 
-		sharedInstance = new FileStore()
-
-		this.sharedInstance = sharedInstance
+		this.sharedInstance = sharedInstance = new FileStore()
 
 		return sharedInstance
 	}
