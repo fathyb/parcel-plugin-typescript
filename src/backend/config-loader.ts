@@ -43,12 +43,11 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 	const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
 
 	// TODO: use the ParsedCommandLine for the type roots
-	// TODO: "parcelTsPluginOptions" makes my eyes bleed
 	const {
 		compilerOptions: {
 			typeRoots
 		} = {} as any,
-		parcelTsPluginOptions: {
+		'parcel-plugin-typescript': {
 			transpileOnly = false,
 			transformers
 		} = {} as any
