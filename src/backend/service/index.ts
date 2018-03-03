@@ -1,8 +1,7 @@
 import * as ts from 'typescript'
 
 import {TypeCheckResult} from '../../interfaces'
-import {formatDiagnostics} from '../format'
-import {reportDiagnostics} from '../reporter'
+import {formatDiagnostics, reportDiagnostics} from '../diagnostics'
 import {LanguageServiceHost} from './host'
 
 export class LanguageService {
@@ -14,7 +13,7 @@ export class LanguageService {
 		this.service = ts.createLanguageService(this.host, ts.createDocumentRegistry())
 	}
 
-	public check(path: string, reportErrors: boolean): TypeCheckResult {
+	public check(path: string, reportErrors: boolean, root: string): TypeCheckResult {
 		const {service} = this
 
 		this.host.invalidate(path)
@@ -23,10 +22,10 @@ export class LanguageService {
 			...service.getSemanticDiagnostics(path),
 			...service.getSyntacticDiagnostics(path)
 		]
-		const formatted = formatDiagnostics(diagnostics, process.cwd())
+		const formatted = formatDiagnostics(diagnostics, root)
 
 		if(reportErrors && diagnostics.length > 0) {
-			reportDiagnostics(diagnostics)
+			reportDiagnostics(diagnostics, root)
 		}
 
 		return {

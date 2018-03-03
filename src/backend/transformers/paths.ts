@@ -4,7 +4,7 @@ import * as ts from 'typescript'
 import {findModule} from '../modules/resolver'
 
 // TODO: use options from the TransformationContext
-export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactory<ts.SourceFile> {
+export function PathTransform(options: ts.CompilerOptions, baseDir: string): ts.TransformerFactory<ts.SourceFile> {
 	return function(context: ts.TransformationContext) {
 		return (node: ts.SourceFile) => {
 			if(options.baseUrl) {
@@ -16,7 +16,7 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 							throw new Error('Expected child.moduleSpecifier to be StringLiteral')
 						}
 
-						let resolved = resolve(specifier.text, options)
+						let resolved = resolve(specifier.text, baseDir, options)
 
 						if(path.isAbsolute(resolved)) {
 							const sourceDir = path.dirname(node.fileName)
@@ -42,7 +42,7 @@ export function PathTransform(options: ts.CompilerOptions): ts.TransformerFactor
 	}
 }
 
-function resolve(modulePath: string, {paths, baseUrl}: ts.CompilerOptions): string {
+function resolve(modulePath: string, baseDir: string, {paths, baseUrl}: ts.CompilerOptions): string {
 	if(!baseUrl) {
 		return modulePath
 	}
@@ -56,7 +56,7 @@ function resolve(modulePath: string, {paths, baseUrl}: ts.CompilerOptions): stri
 	if(paths) {
 		const mappings = Object
 			.keys(paths)
-			.map(alias => getPathMappings(alias, paths[alias], baseUrl))
+			.map(alias => getPathMappings(alias, paths[alias], baseDir, baseUrl))
 			.reduce((a, b) => a.concat(b), [])
 			.filter(mapping => mapping.pattern.test(modulePath))
 
@@ -81,8 +81,8 @@ interface PathMapping {
 	target: string
 }
 
-function getPathMappings(alias: string, targets: string[], baseUrl: string = '.'): PathMapping[] {
-	const absoluteBase = path.resolve(process.cwd(), baseUrl)
+function getPathMappings(alias: string, targets: string[], baseDir: string, baseUrl: string = '.'): PathMapping[] {
+	const absoluteBase = path.resolve(baseDir, baseUrl)
 
 	const moduleOnly = alias.indexOf('*') === -1
 	const escaped = escapeRegExp(alias)

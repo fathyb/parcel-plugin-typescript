@@ -21,7 +21,7 @@ export function MakeTranspileAsset(name: string, pkg: string, options: any): {ne
 		constructor() {
 			super(name, pkg, options)
 
-			this.config = loadConfiguration(name)
+			this.config = loadConfiguration(name, options.rootDir)
 			this.transpiler = this.config.then(config =>
 				new Transpiler(config)
 			)

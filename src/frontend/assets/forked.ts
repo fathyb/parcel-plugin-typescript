@@ -7,7 +7,8 @@ export = function(name: string, pkg: string, options: any): any {
 			const config = await this.config
 			const reportErrors = !config.typescript.options.noEmitOnError
 			const checkPromise = IPCClient.typeCheck({
-				file: this.name, tsConfig: config.path,
+				file: this.name,
+				rootDir: this.options.rootDir,
 				reportErrors
 			})
 
@@ -17,7 +18,7 @@ export = function(name: string, pkg: string, options: any): any {
 				if(diagnostics) {
 					console.error(diagnostics)
 
-					// tslint:disable:no-string-throw
+					// tslint:disable-next-line:no-string-throw
 					throw 'TypeScript errors were found while compiling'
 				}
 			}

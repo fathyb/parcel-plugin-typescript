@@ -2,7 +2,7 @@ import * as ts from 'typescript'
 
 import {CompileResult} from '../../interfaces'
 import {Configuration, Transformers} from '../config-loader'
-import {formatDiagnostics} from '../format'
+import {formatDiagnostics} from '../diagnostics'
 import {CompilerHost} from './host'
 
 // This should only be used for non-watch build
@@ -29,7 +29,7 @@ export class TypeScriptCompiler {
 		this.transformers = transformers
 	}
 
-	public compile(path: string, reportErrors: boolean): CompileResult {
+	public compile(path: string, reportErrors: boolean, root: string): CompileResult {
 		const {program, transformers, host} = this
 		const diagnostics: ts.Diagnostic[] = []
 
@@ -53,7 +53,7 @@ export class TypeScriptCompiler {
 			...program.getSyntacticDiagnostics(sourceFile)
 		)
 
-		const formatted = formatDiagnostics(diagnostics, process.cwd())
+		const formatted = formatDiagnostics(diagnostics, root)
 
 		if(reportErrors && diagnostics.length > 0) {
 			console.error(formatted)
