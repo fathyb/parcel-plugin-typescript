@@ -1,5 +1,5 @@
 import {Request, Response} from '../../interfaces'
-import {Handler} from '../../ipc'
+import {Handler} from '../ipc'
 
 import {TypeScriptCompiler} from '../compiler/tsc'
 import {loadConfiguration} from '../configuration'
