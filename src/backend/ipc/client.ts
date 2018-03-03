@@ -7,7 +7,7 @@ export type Client<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>> = {
 	[P in K]: (data: RQ[P]) => Promise<RS[P]>
 }
 
-export function Client<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(name: string, keys: K[]): Client<RQ, RS, K> {
+export function Client<RQ, RS>(name: string, keys: Array<Keys<RQ, RS>>): Client<RQ, RS, Keys<RQ, RS>> {
 	const object: Partial<Client<RQ, RS>> = {}
 
 	keys.forEach(key => object[key] = data => request<RQ, RS>(name, key, data))
@@ -15,10 +15,10 @@ export function Client<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(name: stri
 	return object as Client<RQ, RS>
 }
 
-async function request<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>>(
-	name: string, endpoint: K, data: RQ[K]
-): Promise<RS[K]> {
-	return new Promise<RS[K]>((resolve, reject) => {
+async function request<RQ, RS>(
+	name: string, endpoint: Keys<RQ, RS>, data: RQ[Keys<RQ, RS>]
+) {
+	return new Promise<RS[Keys<RQ, RS>]>((resolve, reject) => {
 		const serialized = JSON.stringify({data})
 		const req = http.request({
 			socketPath: getSocketPath(name),

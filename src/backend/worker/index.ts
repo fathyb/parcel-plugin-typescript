@@ -1,5 +1,5 @@
 import {CompileRequest, CompileResult, Request, Response, TypeCheckResult} from '../../interfaces'
-import {HandlerMethod, Server, setSocketPath, Worker} from '../../ipc'
+import {HandlerMethod, Server, setSocketPath, Worker} from '../ipc'
 
 export class TypeScriptWorker extends Worker<Request, Response> {
 	constructor() {

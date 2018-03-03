@@ -1,6 +1,6 @@
 import {ChildProcess, fork} from 'child_process'
 
-import {Emitter} from '../../utils/emitter'
+import {Emitter} from '../../../utils/emitter'
 import {Keys} from '../handler'
 
 export interface RequestMessage<R, K extends keyof R = keyof R> {
@@ -23,9 +23,9 @@ export interface ResponseMessage<R, K extends keyof R = keyof R> {
 	}
 }
 
-type Message<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>> = RequestMessage<RQ, K> | ResponseMessage<RS, K>
+type Message<RQ, RS> = RequestMessage<RQ, Keys<RQ, RS>> | ResponseMessage<RS, Keys<RQ, RS>>
 
-export class Worker<RQ = {}, RS = {}, K extends Keys<RQ, RS> = Keys<RQ, RS>> {
+export class Worker<RQ = {}, RS = {}> {
 	private readonly onMessage = new Emitter<Message<RQ, RS>>()
 	private readonly child: ChildProcess
 
@@ -37,7 +37,7 @@ export class Worker<RQ = {}, RS = {}, K extends Keys<RQ, RS> = Keys<RQ, RS>> {
 		this.child.on('message', message => this.onMessage.emit(message))
 	}
 
-	public async request<M extends K>(method: M, data: RQ[M]): Promise<RS[M]> {
+	public async request<M extends Keys<RQ, RS>>(method: M, data: RQ[M]): Promise<RS[M]> {
 		const id = Math.random().toString(36)
 		const promise = this.onMessage.once(({type, id: messageId}) => type === 'response' && messageId === id)
 		const message: RequestMessage<RQ, M> = {id, method, data, type: 'request'}
@@ -51,7 +51,7 @@ export class Worker<RQ = {}, RS = {}, K extends Keys<RQ, RS> = Keys<RQ, RS>> {
 		}
 
 		if(result.data.error === null && result.data.result !== null) {
-			return result.data.result
+			return result.data.result as RS[M]
 		}
 
 		throw new Error(result.data.error || 'Unknown error')
