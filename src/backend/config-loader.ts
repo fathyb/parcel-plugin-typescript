@@ -6,8 +6,8 @@ import commentsJson = require('comment-json')
 import findUp = require('find-up')
 import resolveFrom = require('resolve-from')
 
-import {PathTransform} from '../exports'
 import {readFile} from '../utils/fs'
+import {PathTransform} from './transformers/paths'
 
 export type TransformerList = Array<ts.TransformerFactory<ts.SourceFile>>
 export interface Transformers {
@@ -16,17 +16,17 @@ export interface Transformers {
 }
 
 export interface Configuration {
+	path: string | null
 	typescript: ts.ParsedCommandLine
 	plugin: {
 		transpileOnly: boolean
 		transformers: Transformers
 	}
-	path: string
 }
 
 const configCache: {[path: string]: Configuration} = {}
 
-export async function loadConfiguration(path: string): Promise<Configuration> {
+export async function loadConfiguration(path: string, rootDir: string): Promise<Configuration> {
 	const cached = Object.keys(configCache).find(cachePath => path.indexOf(cachePath) === 0)
 
 	if(cached) {
@@ -35,12 +35,14 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 
 	const cwd = dirname(path)
 	const configPath = await findUp('tsconfig.json', {cwd})
+	let tsconfig: any
 
 	if(!configPath) {
-		throw new Error('Cannot find tsconfig')
+		tsconfig = {}
 	}
-
-	const tsconfig = configPath && commentsJson.parse(await readFile(configPath))
+	else {
+		tsconfig = commentsJson.parse(await readFile(configPath))
+	}
 
 	// TODO: use the ParsedCommandLine for the type roots
 	const {
@@ -62,8 +64,11 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 		]
 	}
 
-	const base = dirname(configPath)
+	const base = configPath
+		? dirname(configPath)
+		: rootDir
 	const typescript = ts.parseJsonConfigFileContent(tsconfig, ts.sys, base)
+
 	const config: Configuration = {
 		typescript,
 		plugin: {
@@ -87,7 +92,7 @@ export async function loadConfiguration(path: string): Promise<Configuration> {
 }
 
 function getTransformerFactory(options: ts.CompilerOptions, dir: string, transformers: any): Transformers {
-	const before: TransformerList = [PathTransform(options)]
+	const before: TransformerList = [PathTransform(options, dir)]
 
 	if(transformers === undefined) {
 		return {before, after: []}

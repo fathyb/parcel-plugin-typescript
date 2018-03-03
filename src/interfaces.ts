@@ -12,8 +12,8 @@ export interface CompileResult extends TypeCheckResult {
 
 export interface CompileRequest {
 	file: string
-	tsConfig: string
 	reportErrors: boolean
+	rootDir: string
 }
 
 export interface Request {

@@ -4,5 +4,5 @@ export * from './transformers/paths'
 
 export * from './config-loader'
 export * from './service'
-export * from './reporter'
+export * from './diagnostics'
 export * from './transpiler'

@@ -1,12 +1,13 @@
+import {loadConfiguration} from './backend/config-loader'
 import {TypeScriptServer} from './backend/worker/index'
-import {getPluginConfig} from './utils/environment'
 
-export = (bundler: any) => {
+export = async (bundler: any) => {
 	if(process.env['PARCEL_PLUGIN_TYPESCRIPT_DISABLE'] === 'true') {
 		return
 	}
 
-	const {transpileOnly} = getPluginConfig()
+	const {watch, rootDir} = bundler.options
+	const {plugin: {transpileOnly}} = await loadConfiguration(`${bundler.options.rootDir}/entry`, rootDir)
 
 	if(transpileOnly) {
 		bundler.addAssetType('ts', require.resolve('./frontend/assets/transpile'))
@@ -15,14 +16,14 @@ export = (bundler: any) => {
 	else {
 		// On watch mode we transpile in the asset process and type-check in a dedicated process
 		// Else we transpile and type-check using a dedicated process
-		const tsAsset = require.resolve(`./frontend/assets/${bundler.options.watch ? 'forked' : 'typescript'}`)
+		const tsAsset = require.resolve(`./frontend/assets/${watch ? 'forked' : 'typescript'}`)
 
 		bundler.addAssetType('ts', tsAsset)
 		bundler.addAssetType('tsx', tsAsset)
 
 		const server = new TypeScriptServer()
 
-		if(!bundler.options.watch) {
+		if(!watch) {
 			bundler.on('buildEnd', () => server.close())
 		}
 	}

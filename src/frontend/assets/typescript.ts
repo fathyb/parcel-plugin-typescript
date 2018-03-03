@@ -14,14 +14,15 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 		constructor() {
 			super(name, pkg, options)
 
-			this.config = loadConfiguration(name)
+			this.config = loadConfiguration(name, options.rootDir)
 		}
 
 		public async parse(): Promise<any> {
 			const config = await this.config
 			const reportErrors = !config.typescript.options.noEmitOnError
 			const result = await IPCClient.compile({
-				file: this.name, tsConfig: config.path,
+				file: this.name,
+				rootDir: this.options.rootDir,
 				reportErrors
 			})
 
