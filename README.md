@@ -6,7 +6,7 @@ Enhanced TypeScript integration for Parcel.
 
 ## Differences with Parcel native support
 
-While Parcel has built-in transpiling support for TypeScript, this plugin provides [additionnal features](#features).
+While Parcel has built-in transpiling support for TypeScript, this plugin provides [additional features](#features).
 
 If you only need transpiling then this plugin might not be necessary. You can see this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
