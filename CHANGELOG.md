@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.7.1"></a>
+## [0.7.1](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.7.0...v0.7.1) (2018-05-05)
+
+
+### Bug Fixes
+
+* **ipc:** prevent Parcel WorkerFarm duplication ([39a7a51](https://github.com/fathyb/parcel-plugin-typescript/commit/39a7a51)), closes [#36](https://github.com/fathyb/parcel-plugin-typescript/issues/36)
+
+
+
 <a name="0.7.0"></a>
 # [0.7.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.6.1...v0.7.0) (2018-02-28)
 
