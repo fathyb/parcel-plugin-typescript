@@ -1,5 +1,9 @@
-import JSAssetLib = require('parcel-bundler/lib/assets/JSAsset')
-import JSAssetSrc = require('parcel-bundler/src/assets/JSAsset')
+// tslint:disable:no-var-requires
 
-export const JSAsset: typeof JSAssetLib = parseInt(process.versions.node, 10) < 8 ? JSAssetLib : JSAssetSrc
+import JSAssetLib = require('parcel-bundler/lib/assets/JSAsset')
+
+export const JSAsset: typeof JSAssetLib = parseInt(process.versions.node, 10) < 8
+	? require('parcel-bundler/lib/assets/JSAsset')
+	: require('parcel-bundler/src/assets/JSAsset')
+
 export type JSAsset = JSAssetLib
