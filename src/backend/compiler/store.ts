@@ -49,7 +49,7 @@ export class FileStore {
 		if(/\.ngfactory\.ts$/.test(path)) {
 			file = files[path.replace(/\.ts$/, '.d.ts')]
 
-			if(file) {
+			if(typeof file === 'string') {
 				return file
 			}
 		}
@@ -79,7 +79,7 @@ export class FileStore {
 
 		const file = this.readFile(path)
 
-		if(!file) {
+		if(typeof file !== 'string') {
 			throw new Error(`Cannot find file ${path}`)
 		}
 
