@@ -11,7 +11,7 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 
 		protected isES6Module: boolean
 
-		constructor(name: string, pkg: string, options: any)
+		constructor(name: string, options: any)
 
 		parse(code: string): Promise<any>
 		load(): Promise<string>

@@ -4,7 +4,7 @@ import {IPCClient} from '../../backend/worker/client'
 import {processSourceMaps} from '../../exports'
 import {JSAsset} from './js-asset'
 
-export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
+export = function MakeTranspileAsset(name: string, options: any) {
 	const {parser} = options
 	const Asset = parser.findParser('file.js') as typeof JSAsset
 
@@ -12,7 +12,7 @@ export = function MakeTranspileAsset(name: string, pkg: string, options: any) {
 		private readonly config: Promise<Configuration>
 
 		constructor() {
-			super(name, pkg, options)
+			super(name, options)
 
 			this.config = loadConfiguration(name, options.rootDir)
 		}

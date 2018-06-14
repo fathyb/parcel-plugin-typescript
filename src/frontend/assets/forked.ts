@@ -1,8 +1,8 @@
 import {IPCClient} from '../../backend/worker/client'
 import {MakeTranspileAsset} from './classes/transpile'
 
-export = function(name: string, pkg: string, options: any): any {
-	return new (class extends MakeTranspileAsset(name, pkg, options) {
+export = function(name: string, options: any): any {
+	return new (class extends MakeTranspileAsset(name, options) {
 		public async transpile(code: string) {
 			const config = await this.config
 			const reportErrors = !config.typescript.options.noEmitOnError

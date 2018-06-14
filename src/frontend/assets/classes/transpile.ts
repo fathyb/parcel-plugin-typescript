@@ -10,7 +10,7 @@ export interface TranspileAsset extends JSAsset {
 	transpile(code: string): Promise<string>
 }
 
-export function MakeTranspileAsset(name: string, pkg: string, options: any): {new(): TranspileAsset} {
+export function MakeTranspileAsset(name: string, options: any): {new(): TranspileAsset} {
 	const {parser} = options
 	const Asset = parser.findParser('file.js') as typeof JSAsset
 
@@ -19,7 +19,7 @@ export function MakeTranspileAsset(name: string, pkg: string, options: any): {ne
 		private readonly transpiler: Promise<Transpiler>
 
 		constructor() {
-			super(name, pkg, options)
+			super(name, options)
 
 			this.config = loadConfiguration(name, options.rootDir)
 			this.transpiler = this.config.then(config =>
