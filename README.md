@@ -10,8 +10,6 @@ While Parcel has built-in transpiling support for TypeScript, this plugin provid
 
 If you only need transpiling then this plugin might not be necessary. You can see this plugin as a Parcel version of `awesome-typescript-loader` or `ts-loader`.
 
-This plugin is in an early stage and may not be stable. This first stable version will be `1.0.0`.
-
 ## Features
 
 - Type checking:  

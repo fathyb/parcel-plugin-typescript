@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.7.1...v1.0.0) (2018-06-14)
+
+
+### Bug Fixes
+
+* **plugin:** support Parcel 1.9.0 ([929127e](https://github.com/fathyb/parcel-plugin-typescript/commit/929127e)), closes [#40](https://github.com/fathyb/parcel-plugin-typescript/issues/40)
+* **store:** don't error on empty files ([4fd58ce](https://github.com/fathyb/parcel-plugin-typescript/commit/4fd58ce))
+
+
+### Code Refactoring
+
+* **config:** rename `parcelTsPluginOptions` ([0efd71c](https://github.com/fathyb/parcel-plugin-typescript/commit/0efd71c))
+
+
+### Features
+
+* **tsc:** support custom AST transformers ([f689e99](https://github.com/fathyb/parcel-plugin-typescript/commit/f689e99)), closes [#28](https://github.com/fathyb/parcel-plugin-typescript/issues/28)
+
+
+### BREAKING CHANGES
+
+* **config:** `parcel-plugin-typescript` should be used
+instead of `parcelTsPluginOptions` in tsconfig.json
+
+
+
 <a name="0.7.1"></a>
 ## [0.7.1](https://github.com/fathyb/parcel-plugin-typescript/compare/v0.7.0...v0.7.1) (2018-05-05)
 
