@@ -1,4 +1,4 @@
-declare module 'parcel-bundler/lib/assets/JSAsset' {
+declare module 'parcel/lib/assets/JSAsset' {
 	class JSAsset {
 		public name: string
 		public relativeName: string
@@ -24,8 +24,8 @@ declare module 'parcel-bundler/lib/assets/JSAsset' {
 
 	export = JSAsset
 }
-declare module 'parcel-bundler/src/assets/JSAsset' {
-	import JSAsset = require('parcel-bundler/lib/assets/JSAsset')
+declare module 'parcel/src/assets/JSAsset' {
+	import JSAsset = require('parcel/lib/assets/JSAsset')
 
 	export = JSAsset
 }
