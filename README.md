@@ -37,12 +37,12 @@ or
 
 ## Configuration
 
-For configuration, you can pass a `parcelTsPluginOptions` object in your `tsconfig.json`:
+For configuration, you can pass a `parcel-plugin-typescript` object in your `tsconfig.json`:
 ```js
 {
   "compilerOptions": {...},
   // the plugin options
-  "parcelTsPluginOptions": {
+  "parcel-plugin-typescript": {
     // If true type-checking is disabled
     "transpileOnly": false
   }
