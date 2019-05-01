@@ -4,42 +4,39 @@ import {CompileResult} from '../../../interfaces'
 
 import {JSAsset} from '../js-asset'
 
+import TypescriptAsset from 'parcel-bundler/src/assets/TypeScriptAsset'
+
 export interface TranspileAsset extends JSAsset {
 	config: Promise<Configuration>
 
 	transpile(code: string): Promise<string>
 }
 
-export function MakeTranspileAsset(name: string, options: any): {new(): TranspileAsset} {
-	const {parser} = options
-	const Asset = parser.findParser('file.js') as typeof JSAsset
+export class MakeTranspileAsset extends TypescriptAsset {
+	public readonly config: Promise<Configuration>
+	private readonly transpiler: Promise<Transpiler>
 
-	return class TSAsset extends Asset {
-		public readonly config: Promise<Configuration>
-		private readonly transpiler: Promise<Transpiler>
+	constructor(name: string, options: any) {
+		super(name, options)
 
-		constructor() {
-			super(name, options)
+		this.config = loadConfiguration(name, options.rootDir)
+		this.transpiler = this.config.then(config =>
+			new Transpiler(config)
+		)
+	}
 
-			this.config = loadConfiguration(name, options.rootDir)
-			this.transpiler = this.config.then(config =>
-				new Transpiler(config)
-			)
-		}
+	public async parse(code: string) {
+		this.contents = await this.transpile(code)
 
-		public async parse(code: string) {
-			this.contents = await this.transpile(code)
+		// Parse result as ast format through babylon
+		return super.parse(this.contents)
+	}
 
-			// Parse result as ast format through babylon
-			return super.parse(this.contents)
-		}
+	public async transpile(code: string): Promise<string> {
+		const transpiler = await this.transpiler
+		const {sources} = transpiler.transpile(code, this.name)
 
-		public async transpile(code: string): Promise<string> {
-			const transpiler = await this.transpiler
-			const {sources} = transpiler.transpile(code, this.name)
-
-			return processSourceMaps(this, sources).js
-		}
+		return processSourceMaps(this, sources).js
 	}
 }
 
