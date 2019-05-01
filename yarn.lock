@@ -812,6 +812,13 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
+"@types/parcel-bundler@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@types/parcel-bundler/-/parcel-bundler-1.12.0.tgz#ab35ec277689593b6b281d689f0d86b0249f9220"
+  integrity sha512-25U2PLViO4rmT3XO3Mf5pSddLVr+ey5AzX9PgGzIvvMbzxkzdRGvcxb55n8W7CmYEdc9QQHRJR++a7aMSkcAzQ==
+  dependencies:
+    "@types/express-serve-static-core" "*"
+
 "@types/q@^1.5.1":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"

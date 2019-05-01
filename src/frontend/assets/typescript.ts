@@ -8,7 +8,7 @@ import TypescriptAsset from 'parcel-bundler/src/assets/TypeScriptAsset'
 class TSAsset extends TypescriptAsset {
 	private readonly config: Promise<Configuration>
 
-	constructor() {
+	constructor(name: string, options: any) {
 		super(name, options)
 
 		this.config = loadConfiguration(name, options.rootDir)
