@@ -16,6 +16,7 @@
 		"importHelpers": true,
 		"downlevelIteration": true,
 		"moduleResolution": "node",
+		"esModuleInterop": true,
 
 		"rootDir": "src",
 		"outDir": "build"

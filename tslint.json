@@ -4,7 +4,6 @@
 		"no-duplicate-variable": true,
 		"no-string-literal": false,
 		"no-console": [false],
-		"no-unused-variable": [true],
 		"whitespace": [
 			true,
 			"check-operator", "check-separator", "check-type", "check-typecast"

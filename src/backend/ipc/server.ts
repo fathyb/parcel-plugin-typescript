@@ -10,8 +10,6 @@ export class Server<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>> {
 	private readonly app = express()
 	private readonly server: HTTPServer
 
-	private listening = false
-
 	constructor(name: string, handler: Handler<RQ, RS>) {
 		const app = this.app.use(bodyParser.json({limit: '10mb'}))
 
@@ -35,7 +33,7 @@ export class Server<RQ, RS, K extends Keys<RQ, RS> = Keys<RQ, RS>> {
 		)
 
 		this.server = app
-			.listen(setSocketPath(name), () => this.listening = true)
+			.listen(setSocketPath(name))
 			.on('error', err => console.error(err))
 	}
 
